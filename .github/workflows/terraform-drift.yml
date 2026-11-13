@@ -11,6 +11,8 @@ permissions:
 
 jobs:
   list:
+    # Off until Azure is wired up: set repository variable AZURE_ENABLED=true.
+    if: vars.AZURE_ENABLED == 'true'
     runs-on: ubuntu-latest
     outputs: { clients: "${{ steps.c.outputs.clients }}" }
     steps:
