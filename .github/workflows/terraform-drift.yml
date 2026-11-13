@@ -1,0 +1,52 @@
+name: terraform-drift
+
+on:
+  schedule: [{ cron: "0 6 * * 1-5" }]   # weekdays 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+  issues: write
+
+jobs:
+  list:
+    runs-on: ubuntu-latest
+    outputs: { clients: "${{ steps.c.outputs.clients }}" }
+    steps:
+      - uses: actions/checkout@v4
+      - id: c
+        run: echo "clients=$(scripts/clients.sh all)" >> "$GITHUB_OUTPUT"
+
+  drift:
+    needs: list
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: { client: "${{ fromJson(needs.list.outputs.clients) }}" }
+    environment: client-${{ matrix.client }}-plan
+    env:
+      ARM_USE_OIDC: "true"
+      ARM_USE_AZUREAD: "true"
+      ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with: { terraform_version: 1.9.8 }
+      - id: plan
+        working-directory: terraform/stamps/client
+        run: |
+          terraform init -input=false -backend-config=../../clients/${{ matrix.client }}/backend.hcl
+          set +e
+          terraform plan -input=false -lock=false -detailed-exitcode \
+            -var-file=../../clients/${{ matrix.client }}/terraform.tfvars > /dev/null
+          echo "code=$?" >> "$GITHUB_OUTPUT"
+      - if: steps.plan.outputs.code == '2'
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          gh issue create --label drift \
+            --title "Drift detected: ${{ matrix.client }}" \
+            --body "Nightly plan found changes made outside Terraform. Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+      - if: steps.plan.outputs.code == '1'
+        run: exit 1

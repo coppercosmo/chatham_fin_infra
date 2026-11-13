@@ -1,0 +1,71 @@
+name: terraform-pr
+
+on:
+  pull_request:
+    paths: ["terraform/**", ".github/workflows/**", "scripts/**"]
+
+permissions:
+  contents: read
+  id-token: write        # OIDC to Azure
+  pull-requests: write
+
+env:
+  TF_IN_AUTOMATION: "true"
+  ARM_USE_OIDC: "true"
+  ARM_USE_AZUREAD: "true"
+
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    outputs:
+      clients: ${{ steps.affected.outputs.clients }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: hashicorp/setup-terraform@v3
+        with: { terraform_version: 1.9.8 }
+      - run: terraform fmt -check -recursive terraform
+      - name: validate + offline tests (mocked provider, no Azure access)
+        working-directory: terraform/stamps/client
+        run: |
+          terraform init -backend=false
+          terraform validate
+          terraform test
+      - uses: terraform-linters/setup-tflint@v4
+      - run: tflint --recursive --chdir terraform
+      - name: checkov (policy as code, mirrors P&T guardrails)
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: terraform
+          framework: terraform
+          quiet: true
+      - id: affected
+        run: echo "clients=$(scripts/clients.sh changed origin/${{ github.base_ref }})" >> "$GITHUB_OUTPUT"
+
+  plan:
+    needs: static
+    if: needs.static.outputs.clients != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        client: ${{ fromJson(needs.static.outputs.clients) }}
+    # Plan-only environment per client: holds that client's AZURE_CLIENT_ID; no approval needed.
+    environment: client-${{ matrix.client }}-plan
+    env:
+      ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with: { terraform_version: 1.9.8 }
+      - name: plan ${{ matrix.client }}
+        working-directory: terraform/stamps/client
+        run: |
+          terraform init -input=false -backend-config=../../clients/${{ matrix.client }}/backend.hcl
+          terraform plan -input=false -lock=false -no-color \
+            -var-file=../../clients/${{ matrix.client }}/terraform.tfvars -out=tfplan | tee plan.txt
+      - name: summary
+        working-directory: terraform/stamps/client
+        run: |
+          { echo "### Plan: \`${{ matrix.client }}\`"; echo '```'; grep -E '^(Plan:|No changes)' plan.txt || true; echo '```'; } >> "$GITHUB_STEP_SUMMARY"

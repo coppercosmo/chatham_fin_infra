@@ -1,0 +1,31 @@
+name: apply-client
+
+on:
+  workflow_call:
+    inputs:
+      client: { type: string, required: true }
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    # Required reviewers are configured on this environment for ring 1 and 2 clients.
+    environment: client-${{ inputs.client }}
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      TF_IN_AUTOMATION: "true"
+      ARM_USE_OIDC: "true"
+      ARM_USE_AZUREAD: "true"
+      ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with: { terraform_version: 1.9.8 }
+      - name: plan + apply ${{ inputs.client }}
+        working-directory: terraform/stamps/client
+        run: |
+          terraform init -input=false -backend-config=../../clients/${{ inputs.client }}/backend.hcl
+          terraform plan -input=false -var-file=../../clients/${{ inputs.client }}/terraform.tfvars -out=tfplan
+          terraform apply -input=false tfplan

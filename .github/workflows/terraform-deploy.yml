@@ -1,0 +1,59 @@
+name: terraform-deploy
+
+# Ring-based fan-out (ADR 0008). Each ring waits for the previous ring to succeed.
+# Each client job runs in GitHub Environment `client-<code>`, whose AZURE_CLIENT_ID is a
+# deployment identity federated ONLY to that environment, with rights ONLY on that client's subscription.
+
+on:
+  push:
+    branches: [main]
+    paths: ["terraform/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: terraform-deploy
+  cancel-in-progress: false
+
+jobs:
+  rings:
+    runs-on: ubuntu-latest
+    outputs:
+      ring0: ${{ steps.r.outputs.ring0 }}
+      ring1: ${{ steps.r.outputs.ring1 }}
+      ring2: ${{ steps.r.outputs.ring2 }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: r
+        run: |
+          for n in 0 1 2; do echo "ring$n=$(scripts/clients.sh ring $n)" >> "$GITHUB_OUTPUT"; done
+
+  ring0:
+    needs: rings
+    if: needs.rings.outputs.ring0 != '[]'
+    strategy:
+      matrix: { client: "${{ fromJson(needs.rings.outputs.ring0) }}" }
+    uses: ./.github/workflows/_apply-client.yml
+    with: { client: "${{ matrix.client }}" }
+
+  ring1:
+    needs: [rings, ring0]
+    if: always() && !failure() && !cancelled() && needs.rings.outputs.ring1 != '[]'
+    strategy:
+      fail-fast: true
+      matrix: { client: "${{ fromJson(needs.rings.outputs.ring1) }}" }
+    uses: ./.github/workflows/_apply-client.yml
+    with: { client: "${{ matrix.client }}" }
+
+  ring2:
+    needs: [rings, ring1]
+    if: always() && !failure() && !cancelled() && needs.rings.outputs.ring2 != '[]'
+    strategy:
+      fail-fast: true
+      max-parallel: 5
+      matrix: { client: "${{ fromJson(needs.rings.outputs.ring2) }}" }
+    uses: ./.github/workflows/_apply-client.yml
+    with: { client: "${{ matrix.client }}" }

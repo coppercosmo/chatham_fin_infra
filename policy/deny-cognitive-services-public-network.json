@@ -1,0 +1,18 @@
+{
+  "properties": {
+    "displayName": "AI Advisory: Cognitive Services accounts must disable public network access",
+    "mode": "Indexed",
+    "policyRule": {
+      "if": {
+        "allOf": [
+          { "field": "type", "equals": "Microsoft.CognitiveServices/accounts" },
+          { "field": "Microsoft.CognitiveServices/accounts/publicNetworkAccess", "notEquals": "Disabled" }
+        ]
+      },
+      "then": { "effect": "[parameters('effect')]" }
+    },
+    "parameters": {
+      "effect": { "type": "String", "allowedValues": ["Audit", "Deny", "Disabled"], "defaultValue": "Deny" }
+    }
+  }
+}

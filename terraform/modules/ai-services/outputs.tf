@@ -1,0 +1,9 @@
+output "openai_id" { value = azurerm_cognitive_account.openai.id }
+output "openai_endpoint" { value = azurerm_cognitive_account.openai.endpoint }
+output "openai_principal_id" { value = azurerm_cognitive_account.openai.identity[0].principal_id }
+output "deployment_names" { value = keys(azurerm_cognitive_deployment.this) }
+output "search_id" { value = try(azurerm_search_service.this[0].id, null) }
+output "search_endpoint" { value = try("https://${azurerm_search_service.this[0].name}.search.windows.net", null) }
+output "search_principal_id" { value = try(azurerm_search_service.this[0].identity[0].principal_id, null) }
+output "openai_public_network_access_enabled" { value = azurerm_cognitive_account.openai.public_network_access_enabled }
+output "openai_local_auth_enabled" { value = azurerm_cognitive_account.openai.local_auth_enabled }

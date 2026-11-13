@@ -1,0 +1,22 @@
+{
+  "properties": {
+    "displayName": "AI Advisory: allowed Azure OpenAI deployment SKUs (data residency)",
+    "mode": "All",
+    "policyRule": {
+      "if": {
+        "allOf": [
+          { "field": "type", "equals": "Microsoft.CognitiveServices/accounts/deployments" },
+          { "field": "Microsoft.CognitiveServices/accounts/deployments/sku.name", "notIn": "[parameters('allowedSkus')]" }
+        ]
+      },
+      "then": { "effect": "[parameters('effect')]" }
+    },
+    "parameters": {
+      "allowedSkus": {
+        "type": "Array",
+        "defaultValue": ["DataZoneStandard", "Standard", "ProvisionedManaged", "DataZoneProvisionedManaged"]
+      },
+      "effect": { "type": "String", "allowedValues": ["Audit", "Deny", "Disabled"], "defaultValue": "Deny" }
+    }
+  }
+}
