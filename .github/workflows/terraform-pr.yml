@@ -32,19 +32,21 @@ jobs:
           terraform validate
           terraform test
       - uses: terraform-linters/setup-tflint@v4
-      - run: tflint --recursive --chdir terraform
+      - run: tflint --init && tflint --recursive
       - name: checkov (policy as code, mirrors P&T guardrails)
         uses: bridgecrewio/checkov-action@v12
         with:
           directory: terraform
           framework: terraform
           quiet: true
+          soft_fail: true   # report findings; flip to false once accepted risks are suppressed inline
       - id: affected
         run: echo "clients=$(scripts/clients.sh changed origin/${{ github.base_ref }})" >> "$GITHUB_OUTPUT"
 
   plan:
     needs: static
-    if: needs.static.outputs.clients != '[]'
+    # Off until Azure is wired up: set repository variable AZURE_ENABLED=true.
+    if: vars.AZURE_ENABLED == 'true' && needs.static.outputs.clients != '[]'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false

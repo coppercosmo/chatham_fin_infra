@@ -73,6 +73,11 @@ soft-deleted afterwards (purge protection on Key Vault is intentional).
 4. Copy `deployment_client_ids` / `plan_client_ids` outputs into the GitHub Environments
    `client-<code>` / `client-<code>-plan` as `AZURE_CLIENT_ID` (plus `AZURE_TENANT_ID`).
 
+## CI
+Pull requests run `fmt`, `validate`, offline `terraform test`, tflint and checkov with no Azure
+access. Per-client plan, ring deploy and drift jobs stay off until the repository variable
+`AZURE_ENABLED` is set to `true` and the GitHub Environments described above exist.
+
 ## Status and known gaps
 - Validated with Terraform 1.9.8 and azurerm 4.81; all offline tests pass. Not yet applied to a
   live subscription. The client configs use placeholder subscription and object IDs.
