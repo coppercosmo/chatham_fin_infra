@@ -5,11 +5,12 @@ environment     = "prd"
 location        = "eastus2"
 subscription_id = "11111111-1111-1111-1111-111111111111"
 
-connectivity_mode = "standalone"
-address_space     = "10.100.0.0/22"
-zone_redundant    = false
-enable_search     = false
-enable_locks      = false
+connectivity_mode    = "standalone"
+address_space        = "10.100.0.0/22"
+zone_redundant       = false
+enable_search        = false
+search_replica_count = 1
+enable_locks         = false
 
 model_deployments = {
   chat = { model_name = "gpt-4o-mini", model_version = "2024-07-18", capacity = 10 }

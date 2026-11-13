@@ -92,14 +92,18 @@ module "storage" {
 }
 
 module "ai" {
-  source              = "../../modules/ai-services"
-  openai_name         = local.n.openai
-  search_name         = local.n.search
-  resource_group_name = azurerm_resource_group.this.name
-  location            = var.location
-  model_deployments   = var.model_deployments
-  enable_search       = var.enable_search
-  tags                = local.tags
+  source               = "../../modules/ai-services"
+  openai_name          = local.n.openai
+  search_name          = local.n.search
+  resource_group_name  = azurerm_resource_group.this.name
+  location             = var.location
+  model_deployments    = var.model_deployments
+  enable_search        = var.enable_search
+  search_replica_count = var.search_replica_count
+  allowed_outbound_fqdns = [
+    trimsuffix(trimprefix(module.storage.blob_endpoint, "https://"), "/"),
+  ]
+  tags = local.tags
 }
 
 # ------------------------------------------------------------------ private endpoints

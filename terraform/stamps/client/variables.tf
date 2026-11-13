@@ -96,6 +96,12 @@ variable "enable_search" {
   default = true
 }
 
+variable "search_replica_count" {
+  type        = number
+  default     = 3
+  description = "3 meets the AI Search read/write SLA. Use 1 for internal or non-production clients."
+}
+
 # ---------- App (ADR 0005, 0008)
 variable "app_image" {
   type        = string
