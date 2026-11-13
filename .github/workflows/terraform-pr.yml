@@ -39,7 +39,7 @@ jobs:
           directory: terraform
           framework: terraform
           quiet: true
-          soft_fail: true   # report findings; flip to false once accepted risks are suppressed inline
+          soft_fail: false  # blocking: every accepted risk is an inline #checkov:skip with its reason
       - id: affected
         run: echo "clients=$(scripts/clients.sh changed origin/${{ github.base_ref }})" >> "$GITHUB_OUTPUT"
 

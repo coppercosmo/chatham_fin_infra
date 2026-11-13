@@ -41,6 +41,10 @@ resource "azurerm_resource_group" "platform" {
 
 # ---- Terraform state: one container per client, so each pipeline identity sees only its own state.
 resource "azurerm_storage_account" "state" {
+  #checkov:skip=CKV_AZURE_59:Known gap. GitHub-hosted runners need the public endpoint (Entra ID auth only, shared keys off). Closes when self-hosted runners in the platform VNet exist (30/60/90 plan).
+  #checkov:skip=CKV2_AZURE_33:Same gap as CKV_AZURE_59; private endpoint added with self-hosted runners.
+  #checkov:skip=CKV2_AZURE_1:State holds no client documents. Microsoft-managed keys, Entra-only access, per-client containers.
+  #checkov:skip=CKV_AZURE_33:No queue service is used. Blob access logs go to the platform workspace (azurerm_monitor_diagnostic_setting.state_blob).
   name                            = "staiadvtfstate${var.name_suffix}"
   resource_group_name             = azurerm_resource_group.platform.name
   location                        = var.location
@@ -63,11 +67,13 @@ resource "azurerm_storage_account" "state" {
 }
 
 resource "azurerm_storage_container" "platform" {
+  #checkov:skip=CKV2_AZURE_21:Blob access logging is configured on the account's blob service (azurerm_monitor_diagnostic_setting.state_blob).
   name               = "tfstate-platform"
   storage_account_id = azurerm_storage_account.state.id
 }
 
 resource "azurerm_storage_container" "client" {
+  #checkov:skip=CKV2_AZURE_21:Blob access logging is configured on the account's blob service (azurerm_monitor_diagnostic_setting.state_blob).
   for_each           = var.clients
   name               = "tfstate-${each.key}"
   storage_account_id = azurerm_storage_account.state.id
@@ -75,14 +81,51 @@ resource "azurerm_storage_container" "client" {
 
 # ---- Container registry: images are code, not client data.
 resource "azurerm_container_registry" "this" {
-  name                          = "craiadv${var.name_suffix}"
-  resource_group_name           = azurerm_resource_group.platform.name
-  location                      = var.location
-  sku                           = "Premium" # private endpoints, geo-replication, content trust
+  name                = "craiadv${var.name_suffix}"
+  resource_group_name = azurerm_resource_group.platform.name
+  location            = var.location
+  #checkov:skip=CKV_AZURE_164:Docker Content Trust is being retired by ACR. Images are signed with Notation in the app pipeline and deployed by immutable digest.
+  #checkov:skip=CKV_AZURE_165:Single-region platform today. Add a replica when a client runs in a second region.
+  #checkov:skip=CKV_AZURE_166:Quarantine blocks pulls until a scanner marks images verified. Defender for Containers (P&T-owned) scans; revisit if P&T offers a quarantine workflow.
+  sku                           = "Premium" # private endpoints, zone redundancy, dedicated data endpoints
   admin_enabled                 = false
   public_network_access_enabled = false
   anonymous_pull_enabled        = false
+  zone_redundancy_enabled       = true
+  data_endpoint_enabled         = true # per-region data endpoint, so firewalls allow-list one FQDN, not *.blob
+  retention_policy_in_days      = 7    # purge untagged manifests
   tags                          = local.tags
+}
+
+# ---- Platform audit logs: who read or wrote Terraform state, who pushed or pulled images.
+resource "azurerm_log_analytics_workspace" "platform" {
+  name                         = "log-aiadv-platform"
+  location                     = var.location
+  resource_group_name          = azurerm_resource_group.platform.name
+  sku                          = "PerGB2018"
+  retention_in_days            = 365
+  local_authentication_enabled = false
+  tags                         = local.tags
+}
+
+resource "azurerm_monitor_diagnostic_setting" "state_blob" {
+  name                       = "diag-state-blob"
+  target_resource_id         = "${azurerm_storage_account.state.id}/blobServices/default"
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.platform.id
+
+  enabled_log {
+    category_group = "allLogs"
+  }
+}
+
+resource "azurerm_monitor_diagnostic_setting" "acr" {
+  name                       = "diag-acr"
+  target_resource_id         = azurerm_container_registry.this.id
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.platform.id
+
+  enabled_log {
+    category_group = "allLogs"
+  }
 }
 
 # ---- One deployment identity per client (ADR 0004, 0008).

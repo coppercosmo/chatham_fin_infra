@@ -15,6 +15,7 @@ Where each topic the technical team will probe lives in this repo, and the 30-se
 | **Monitoring** | [ADR 0009](../adr/0009-observability-per-client.md), `modules/observability` | Per-client Log Analytics (logs can contain prompts = client data). Central workbook reads across workspaces. AOAI 429s and token usage vs. quota are first-class alerts. |
 | **Working inside P&T guardrails** | [ADR 0002](../adr/0002-work-inside-platform-engineering-guardrails.md), `policy/` | Landing-zone consumer, not a shadow platform. Ask for a vending contract with an SLA, prove compliance in CI, propose AI-specific policies for P&T to own. |
 | **AI coding tools** | [ai-coding-tools.md](ai-coding-tools.md) | How this repo was built with an AI assistant and how the output was reviewed. |
+| **Security scanning / risk triage** | [security-scanning.md](security-scanning.md) | 22 Checkov findings: 6 fixed, 7 false positives or not applicable, 9 accepted risks with reasons and exit plans. The scan now blocks merges. |
 
 ## Honest trade-offs to volunteer (shows judgment)
 - Per-client fixed cost (PEs, LAW, CAE) is real, roughly a few hundred USD/month idle. Priced into hosted engagements.
