@@ -12,6 +12,7 @@ variable "soft_delete_retention_days" {
 }
 
 resource "azurerm_key_vault" "this" {
+  #checkov:skip=CKV2_AZURE_32:Private endpoint is created by the client stamp (module.private_endpoint["kv"]); Checkov can't follow it across modules. Asserted in stamps/client/tests.
   name                          = var.name
   location                      = var.location
   resource_group_name           = var.resource_group_name

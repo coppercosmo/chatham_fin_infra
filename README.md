@@ -74,7 +74,7 @@ soft-deleted afterwards (purge protection on Key Vault is intentional).
    `client-<code>` / `client-<code>-plan` as `AZURE_CLIENT_ID` (plus `AZURE_TENANT_ID`).
 
 ## CI
-Pull requests run `fmt`, `validate`, offline `terraform test`, tflint and checkov with no Azure
+Pull requests run `fmt`, `validate`, offline `terraform test`, tflint and a blocking checkov scan with no Azure
 access. Per-client plan, ring deploy and drift jobs stay off until the repository variable
 `AZURE_ENABLED` is set to `true` and the GitHub Environments described above exist.
 

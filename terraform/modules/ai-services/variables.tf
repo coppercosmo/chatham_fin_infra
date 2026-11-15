@@ -23,3 +23,15 @@ variable "search_sku" {
   type    = string
   default = "basic"
 }
+
+variable "search_replica_count" {
+  type        = number
+  default     = 3
+  description = "Azure AI Search SLA needs 2 replicas for queries and 3 for queries + indexing. Non-production clients can use 1."
+}
+
+variable "allowed_outbound_fqdns" {
+  type        = list(string)
+  default     = []
+  description = "Extra hosts the OpenAI account may call (e.g. the client's blob endpoint). Search is added automatically."
+}
