@@ -30,12 +30,18 @@ locals {
 
   # privatelink zones per sub-resource. Only created in standalone mode; in landing_zone mode they
   # live in the P&T hub and DNS records are written by policy.
-  private_dns_zones = {
-    vault  = "privatelink.vaultcore.azure.net"
-    openai = "privatelink.openai.azure.com"
-    blob   = "privatelink.blob.core.windows.net"
-    search = "privatelink.search.windows.net"
-  }
+  private_dns_zones = merge(
+    {
+      vault  = "privatelink.vaultcore.azure.net"
+      openai = "privatelink.openai.azure.com"
+      blob   = "privatelink.blob.core.windows.net"
+      search = "privatelink.search.windows.net"
+    },
+    local.content_safety ? { cognitiveservices = "privatelink.cognitiveservices.azure.com" } : {}
+  )
+
+  use_ai_gateway = var.ai_gateway != null
+  content_safety = try(var.ai_gateway.enable_content_safety, false)
 }
 
 resource "azurerm_resource_group" "this" {
@@ -56,6 +62,8 @@ module "network" {
   route_table_name    = local.n.route_table
   hub                 = var.connectivity_mode == "landing_zone" ? var.hub : null
   compute_platform    = var.compute_platform
+  enable_apim_subnet  = local.use_ai_gateway
+  nsg_apim_name       = local.n.nsg_apim
 
   enable_ingress_subnet           = var.ingress != null
   nsg_agw_name                    = local.n.nsg_agw
@@ -170,8 +178,12 @@ module "app_identity" {
   tags                = local.tags
 
   role_assignments = merge(
+    # With the AI gateway on, the app has NO direct model access: only the gateway does, so its
+    # token limits, safety checks and logs can't be bypassed (ADR 0012).
+    local.use_ai_gateway ? {} : {
+      openai = { scope = module.ai.openai_id, role = "Cognitive Services OpenAI User" }
+    },
     {
-      openai  = { scope = module.ai.openai_id, role = "Cognitive Services OpenAI User" }
       kv      = { scope = module.key_vault.id, role = "Key Vault Secrets User" }
       blob    = { scope = module.storage.id, role = "Storage Blob Data Contributor" }
       metrics = { scope = module.observability.app_insights_id, role = "Monitoring Metrics Publisher" }
@@ -218,7 +230,8 @@ locals {
   app_settings = merge(
     {
       CLIENT_CODE            = var.client
-      AZURE_OPENAI_ENDPOINT  = module.ai.openai_endpoint
+      AZURE_OPENAI_ENDPOINT  = local.use_ai_gateway ? module.ai_gateway[0].gateway_url : module.ai.openai_endpoint
+      AI_GATEWAY_ENABLED     = tostring(local.use_ai_gateway)
       AZURE_KEY_VAULT_URI    = module.key_vault.uri
       AZURE_STORAGE_BLOB_URL = module.storage.blob_endpoint
     },
@@ -287,6 +300,45 @@ module "aks" {
       service_account = var.aks.app_service_account
     }
   }
+
+  depends_on = [module.private_endpoint]
+}
+
+# ------------------------------------------------------------------ AI gateway (ADR 0012)
+module "ai_gateway" {
+  source              = "../../modules/ai-gateway"
+  count               = local.use_ai_gateway ? 1 : 0
+  name                = local.n.ai_gateway
+  resource_group_name = azurerm_resource_group.this.name
+  location            = var.location
+  tenant_id           = data.azurerm_client_config.current.tenant_id
+  client              = var.client
+  sku_name            = var.ai_gateway.sku_name
+  zones               = var.zone_redundant ? ["1", "2", "3"] : null
+  publisher_email     = var.owner_email
+  subnet_id           = module.network.apim_subnet_id
+  vnet_id             = module.network.vnet_id
+  tags                = local.tags
+
+  # Primary = this client's own AOAI account; extra backends (e.g. a second region in the same
+  # data zone, or a PTU account) come from client config. All in this client's subscription.
+  backends = concat(
+    [{ name = "aoai-primary", url = module.ai.openai_endpoint, resource_id = module.ai.openai_id }],
+    var.ai_gateway.additional_backends,
+  )
+  allowed_caller_client_ids = [module.app_identity.client_id]
+  tokens_per_minute         = var.ai_gateway.tokens_per_minute
+  monthly_token_quota       = var.ai_gateway.monthly_token_quota
+  log_request_bodies_bytes  = var.ai_gateway.log_request_bodies_bytes
+
+  enable_content_safety                  = local.content_safety
+  content_safety_name                    = local.n.content_safety
+  pe_subnet_id                           = module.network.pe_subnet_id
+  cognitiveservices_private_dns_zone_ids = local.standalone && local.content_safety ? [azurerm_private_dns_zone.this["cognitiveservices"].id] : []
+
+  log_analytics_workspace_id     = module.observability.workspace_id
+  app_insights_id                = module.observability.app_insights_id
+  app_insights_connection_string = module.observability.app_insights_connection_string
 
   depends_on = [module.private_endpoint]
 }

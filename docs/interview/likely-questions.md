@@ -106,3 +106,47 @@ I want one WAF, cert and log pattern everywhere. So it's App Gateway WAF in fron
 The Azure Policy add-on runs Gatekeeper, so P&T's Kubernetes policy initiatives (no privileged
 containers, allowed registries, required limits) are enforced in-cluster, and compliance shows up in
 the same Azure Policy view they already use.
+
+## AI gateway (ADR 0012)
+
+**"Where does an AI gateway fit, and doesn't the WAF already do this?"**
+Different jobs. The WAF protects the edge from bad user traffic. The AI gateway sits behind the app
+and governs model traffic: who may call which model, how many tokens per minute, which backend to
+use when one is saturated, and how usage is metered. Order: users -> App Gateway WAF -> app ->
+APIM AI gateway -> Azure OpenAI over private endpoints.
+
+**"Shared APIM or one per client?"**
+For client data, one per client in the client's subscription. A shared gateway processes every
+client's prompts with one identity that can call every client's models, and needs network paths
+into every spoke, which undoes the subscription-per-client boundary. If Platform Engineering runs a
+central APIM, the compromise is a workspace with a dedicated workspace gateway per client. For
+internal apps, shared is fine and cheaper.
+
+**"How do you stop one workload draining a client's quota?"**
+`llm-token-limit` per calling identity (tokens per minute, optional monthly quota), set below the
+deployment's capacity so interactive traffic keeps headroom. Callers get remaining-token headers so
+they can back off before a 429.
+
+**"How do you do chargeback?"**
+`llm-emit-token-metric` with Client and CallerAppId dimensions, plus the APIM LLM logs table with
+prompt and completion tokens per request in the client's workspace. Monthly KQL rolls it up per
+deployment and app. No prompt text is logged by default.
+
+**"PTU and pay-as-you-go together?"**
+The PTU deployment is the primary backend; pay-as-you-go (or a second region in the same data zone)
+is the secondary. A 429 or 5xx fails over, and a circuit breaker keeps the saturated backend out of
+rotation for a minute, honouring Retry-After. Native load-balanced pools are the cleaner version once
+the Terraform provider supports them.
+
+**"Can an app skip the gateway?"**
+No. When the gateway is on, the app's identity has no role on the model accounts; only the
+gateway's managed identity does. A test in CI asserts that.
+
+**"It's in preview. Would you put it in production?"**
+The core APIM AI gateway policies are what I'd rely on; the Foundry attachment and content safety
+policy are preview. So: ring 0 on our internal client first, measure latency and reconcile token
+numbers, then a pilot client, with explicit exit criteria before it becomes the default.
+
+**"Semantic caching?"**
+Useful for FAQ-style apps, but within a client it can hand one user's answer to another user, so
+it's per client, varied by user or group, and enabled per solution after review, not by default.

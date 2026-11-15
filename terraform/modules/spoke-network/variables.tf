@@ -42,6 +42,17 @@ variable "enable_ingress_subnet" {
   description = "Create the dedicated Application Gateway subnet."
 }
 
+variable "enable_apim_subnet" {
+  type        = bool
+  default     = false
+  description = "Create the dedicated API Management (AI gateway) subnet."
+}
+
+variable "nsg_apim_name" {
+  type    = string
+  default = null
+}
+
 variable "nsg_agw_name" {
   type    = string
   default = null

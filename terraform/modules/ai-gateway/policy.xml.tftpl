@@ -1,0 +1,72 @@
+<!--
+  AI gateway policy for client "${client}" (ADR 0012). Rendered by Terraform; do not edit in the portal.
+  Order matters: authenticate the caller, screen the prompt, apply token limits, then call the model
+  with the gateway's own managed identity, failing over across backends on 429/5xx.
+-->
+<policies>
+  <inbound>
+    <base />
+    <!-- 1. Only this client's app identity may call. No API keys: the app presents an Entra token. -->
+    <validate-azure-ad-token tenant-id="${tenant_id}" header-name="Authorization" failed-validation-httpcode="401" failed-validation-error-message="Unauthorized">
+      <client-application-ids>
+%{ for id in caller_ids ~}
+        <application-id>${id}</application-id>
+%{ endfor ~}
+      </client-application-ids>
+      <audiences>
+        <audience>https://cognitiveservices.azure.com</audience>
+      </audiences>
+    </validate-azure-ad-token>
+    <set-variable name="callerAppId" value="@(context.Request.Headers.GetValueOrDefault(&quot;Authorization&quot;,&quot;&quot;).AsJwt()?.Claims.GetValueOrDefault(&quot;appid&quot;, &quot;unknown&quot;))" />
+%{ if content_safety ~}
+    <!-- 2. Prompt Shields + harm categories before any tokens are spent (preview policy). -->
+    <llm-content-safety backend-id="content-safety" shield-prompt="true">
+      <categories output-type="FourSeverityLevels">
+        <category name="Hate" threshold="4" />
+        <category name="Violence" threshold="4" />
+        <category name="SelfHarm" threshold="4" />
+        <category name="Sexual" threshold="4" />
+      </categories>
+    </llm-content-safety>
+%{ endif ~}
+    <!-- 3. Token rate limit (and optional monthly quota) per calling identity. -->
+    <llm-token-limit counter-key="@((string)context.Variables[&quot;callerAppId&quot;])" tokens-per-minute="${tpm}"%{ if quota > 0 } token-quota="${quota}" token-quota-period="Monthly"%{ endif } estimate-prompt-tokens="true" remaining-tokens-header-name="x-ratelimit-remaining-tokens" tokens-consumed-header-name="x-tokens-consumed" />
+    <!-- 4. Token usage metrics for chargeback/showback, tagged with client and caller. -->
+    <llm-emit-token-metric namespace="ai-gateway">
+      <dimension name="Client" value="${client}" />
+      <dimension name="CallerAppId" value="@((string)context.Variables[&quot;callerAppId&quot;])" />
+      <dimension name="API ID" />
+      <dimension name="Operation ID" />
+    </llm-emit-token-metric>
+    <!-- 5. Call the model as the gateway's managed identity (the app has no direct model access). -->
+    <authentication-managed-identity resource="https://cognitiveservices.azure.com" />
+    <set-backend-service backend-id="${backends[0]}" />
+  </inbound>
+  <backend>
+%{ if length(backends) > 1 ~}
+    <!-- Priority failover. Each backend also has a native circuit breaker (Terraform), so a tripped
+         backend fails fast and the retry moves to the next one. -->
+    <retry condition="@(context.Response != null &amp;&amp; (context.Response.StatusCode == 429 || context.Response.StatusCode &gt;= 500))" count="${length(backends) - 1}" interval="0" first-fast-retry="true">
+      <choose>
+%{ for i, b in backends ~}
+%{ if i > 0 ~}
+        <when condition="@(context.Response != null &amp;&amp; context.Variables.GetValueOrDefault&lt;int&gt;(&quot;attempt&quot;, 0) == ${i - 1})">
+          <set-backend-service backend-id="${b}" />
+        </when>
+%{ endif ~}
+%{ endfor ~}
+      </choose>
+      <set-variable name="attempt" value="@(context.Variables.GetValueOrDefault&lt;int&gt;(&quot;attempt&quot;, -1) + 1)" />
+      <forward-request buffer-request-body="true" timeout="180" />
+    </retry>
+%{ else ~}
+    <forward-request buffer-request-body="true" timeout="180" />
+%{ endif ~}
+  </backend>
+  <outbound>
+    <base />
+  </outbound>
+  <on-error>
+    <base />
+  </on-error>
+</policies>

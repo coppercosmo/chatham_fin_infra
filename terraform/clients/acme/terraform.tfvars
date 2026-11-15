@@ -28,6 +28,13 @@ acr = {
 }
 app_image = "craiadvx7k2.azurecr.io/advisor-api@sha256:0000000000000000000000000000000000000000000000000000000000000000"
 
+# AI gateway (ADR 0012): the app reaches Azure OpenAI only through APIM. Ring 1 pilot client.
+ai_gateway = {
+  sku_name              = "Premium_1"
+  tokens_per_minute     = 40000
+  enable_content_safety = true
+}
+
 # Private ingress: users reach acme.ai.<domain> over the hub (ExpressRoute/VPN or Front Door
 # Premium Private Link). P&T's DNS points the name at the App Gateway private IP (10.100.6.10).
 ingress = {
