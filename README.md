@@ -25,6 +25,8 @@ flowchart LR
 
 **Full picture:** [docs/architecture/diagram/solution-architecture.svg](docs/architecture/diagram/solution-architecture.svg) shows every component for three example clients side by side (governance, hub, each client stamp, the shared platform subscription and the delivery pipeline). It is generated from [generate.py](docs/architecture/diagram/generate.py).
 
+**Edit it in draw.io:** [open in diagrams.net](https://app.diagrams.net/#Uhttps%3A%2F%2Fraw.githubusercontent.com%2Fcoppercosmo%2Fchatham_fin_infra%2Fmain%2Fdocs%2Farchitecture%2Fdiagram%2Fsolution-architecture.drawio) (editable copy; use File > Save as to keep your changes), or [open from GitHub](https://app.diagrams.net/#Hcoppercosmo%2Fchatham_fin_infra%2Fmain%2Fdocs%2Farchitecture%2Fdiagram%2Fsolution-architecture.drawio) to save edits back to the repo. The native file is [solution-architecture.drawio](docs/architecture/diagram/solution-architecture.drawio), with Azure icons and every box as its own shape.
+
 [![Multi-client solution architecture](docs/architecture/diagram/solution-architecture.svg)](docs/architecture/diagram/solution-architecture.svg)
 
 ## What a client gets (the "stamp")
