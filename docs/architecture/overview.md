@@ -2,10 +2,30 @@
 
 The full multi-client diagram, with every component for three example clients, is
 [diagram/solution-architecture.svg](diagram/solution-architecture.svg) (PNG:
-[solution-architecture.png](diagram/solution-architecture.png)). The sections below break it down
+[solution-architecture.png](diagram/solution-architecture.png); editable draw.io versions below).
+The sections below break it down
 piece by piece.
 
-To change it, edit [diagram/generate.py](diagram/generate.py) and regenerate:
+### Editing in draw.io (diagrams.net)
+
+The same diagram is published in two draw.io formats, with Azure icons and every box, label and arrow
+as its own editable shape:
+
+| File | Use |
+|---|---|
+| [diagram/solution-architecture.drawio](diagram/solution-architecture.drawio) | Native file for app.diagrams.net, draw.io desktop or the VS Code "Draw.io Integration" extension |
+| [diagram/solution-architecture.drawio.svg](diagram/solution-architecture.drawio.svg) | An SVG that GitHub renders and draw.io opens as an editable diagram (the model is embedded) |
+
+- [Open in diagrams.net](https://app.diagrams.net/#Uhttps%3A%2F%2Fraw.githubusercontent.com%2Fcoppercosmo%2Fchatham_fin_infra%2Fmain%2Fdocs%2Farchitecture%2Fdiagram%2Fsolution-architecture.drawio): opens a copy from `main`; use File > Save as to keep it (device, OneDrive, Google Drive...).
+- [Open from GitHub in diagrams.net](https://app.diagrams.net/#Hcoppercosmo%2Fchatham_fin_infra%2Fmain%2Fdocs%2Farchitecture%2Fdiagram%2Fsolution-architecture.drawio): after authorising the diagrams.net GitHub app you can save straight back to the repo as a commit.
+
+Pick one source of truth. `generate.py` overwrites all four files, so once someone edits the `.drawio`
+by hand, either carry the change back into `generate.py` or stop regenerating and treat the `.drawio` as the
+source (export the SVG/PNG from draw.io with File > Export).
+
+### Regenerating from code
+
+To change it in code, edit [diagram/generate.py](diagram/generate.py) and regenerate:
 
 ```bash
 python3 docs/architecture/diagram/generate.py
