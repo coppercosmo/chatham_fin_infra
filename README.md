@@ -25,8 +25,13 @@ flowchart LR
 
 ## What a client gets (the "stamp")
 Spoke VNet peered to the hub, everything private: Azure OpenAI (data-zone deployments, keys off),
-AI Search, Storage, Key Vault, internal Container Apps, a user-assigned managed identity with
-resource-scoped roles, its own Log Analytics + App Insights, budget alerts, and delete locks.
+AI Search, Storage, Key Vault, a user-assigned managed identity with resource-scoped roles, its own
+Log Analytics + App Insights, budget alerts, and delete locks. Two per-client choices:
+
+- **Compute**: internal Container Apps (default) or a dedicated private AKS cluster
+  (`compute_platform = "aks"`, ADR 0011).
+- **Ingress**: an Application Gateway WAF_v2 with a private frontend (or a locked-down public one),
+  TLS end to end with certificates from the client's Key Vault (`ingress = {...}`, ADR 0010).
 
 ## Repo layout
 | Path | What |
@@ -35,10 +40,11 @@ resource-scoped roles, its own Log Analytics + App Insights, budget alerts, and 
 | `docs/architecture/` | Diagrams: estate, stamp, request path ([overview](docs/architecture/overview.md)) |
 | `docs/runbooks/` | Onboard / offboard a client, incident runbook |
 | `docs/interview/` | Topic map, likely questions, 30/60/90, AI tooling notes |
-| `terraform/modules/` | Reusable modules: naming, spoke-network, private-endpoint, key-vault, storage, ai-services, container-apps, observability, workload-identity, deployment-identity |
+| `terraform/modules/` | Reusable modules: naming, spoke-network, private-endpoint, key-vault, storage, ai-services, container-apps, aks, app-gateway, observability, workload-identity, deployment-identity |
 | `terraform/stamps/client/` | Root module: one complete isolated client environment, plus offline tests |
 | `terraform/platform/` | Shared platform subscription: state, ACR, per-client CI identities |
 | `terraform/clients/<code>/` | Per-client `terraform.tfvars`, `backend.hcl`, `client.json` (ring) |
+| `kubernetes/` | AKS path: internal NGINX controller, app with workload identity, default-deny network policy |
 | `policy/` | AI guardrail policy definitions proposed to Platform Engineering |
 | `.github/workflows/` | PR checks + per-client plans, ring-based apply, nightly drift |
 
@@ -49,6 +55,8 @@ cd terraform/stamps/client
 terraform init -backend=false
 terraform validate
 terraform test          # mocked provider; asserts isolation/security properties
+cd ../../..
+scripts/test-client-configs.sh   # also type-checks every client config in terraform/clients
 ```
 
 Deploy a demo client into your own subscription (standalone mode, no hub required):
@@ -82,5 +90,5 @@ access. Per-client plan, ring deploy and drift jobs stay off until the repositor
 - Validated with Terraform 1.9.8 and azurerm 4.81; all offline tests pass. Not yet applied to a
   live subscription. The client configs use placeholder subscription and object IDs.
 - Known gaps, not built yet: self-hosted runners for private data-plane access, Azure
-  Monitor Private Link Scope, customer-managed keys per client, and the front-door/ingress pattern
-  (owned by Platform Engineering).
+  Monitor Private Link Scope, customer-managed keys per client, a Front Door Premium edge for
+  internet-facing multi-region clients, and Flux configuration for the AKS path.

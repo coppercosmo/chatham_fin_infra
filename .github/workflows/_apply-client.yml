@@ -5,6 +5,9 @@ on:
     inputs:
       client: { type: string, required: true }
 
+permissions:
+  contents: read
+
 jobs:
   apply:
     runs-on: ubuntu-latest

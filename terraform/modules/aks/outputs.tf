@@ -1,0 +1,9 @@
+output "id" { value = azurerm_kubernetes_cluster.this.id }
+output "name" { value = azurerm_kubernetes_cluster.this.name }
+output "private_fqdn" { value = azurerm_kubernetes_cluster.this.private_fqdn }
+output "oidc_issuer_url" { value = azurerm_kubernetes_cluster.this.oidc_issuer_url }
+output "kubelet_object_id" { value = azurerm_user_assigned_identity.kubelet.principal_id }
+output "private_cluster_enabled" { value = azurerm_kubernetes_cluster.this.private_cluster_enabled }
+output "local_account_disabled" { value = azurerm_kubernetes_cluster.this.local_account_disabled }
+output "network_policy" { value = azurerm_kubernetes_cluster.this.network_profile[0].network_policy }
+output "outbound_type" { value = azurerm_kubernetes_cluster.this.network_profile[0].outbound_type }

@@ -15,9 +15,9 @@ the public internet.
   - `snet-pe` (/26) for private endpoints
 - **All PaaS services have `public_network_access` disabled** and are reached through private
   endpoints in `snet-pe`.
-- Container Apps environment is **internal** (no public IP). Client users reach the app through
-  P&T's ingress (Application Gateway / Front Door Premium with Private Link) or the client's
-  private connectivity, decided per engagement.
+- Compute is **internal** (no public IP). Client users reach the app through a per-client
+  Application Gateway WAF_v2 with a private frontend in its own subnet (`snet-agw`), see
+  [ADR 0010](0010-private-ingress-app-gateway-waf.md). Public exposure is an explicit per-client choice.
 - Egress: a route table sends `0.0.0.0/0` to the hub firewall, so outbound traffic is inspected
   and allow-listed.
 - Spokes **never peer with each other**. The only path between two clients would be through the

@@ -36,6 +36,12 @@ locals {
     "3913510d-42f4-4e42-8a64-420c390055eb", # Monitoring Metrics Publisher
     "2a2b9908-6ea1-4ae2-8e65-a410df84e7d1", # Storage Blob Data Reader (AI Search indexer)
     "acdd72a7-3d63-4fea-9abd-60d6d93d4a2a", # Reader (for P&T-owned reader group)
+    # AKS option (ADR 0011): control-plane identity on its own subnet/route table/DNS zone, readers on the cluster.
+    # Network Contributor is the broadest role in this list; the stamp only ever scopes it to one subnet or route table.
+    "4d97b98b-1d4f-4787-a291-c67834d212e7", # Network Contributor
+    "b12aa53e-6015-4669-85d0-8515ebb3ae7f", # Private DNS Zone Contributor
+    "7f6c6a51-bcf8-42ba-9220-52d62157d7db", # Azure Kubernetes Service RBAC Reader
+    "f1a07417-d97a-45cb-824c-7a7467783830", # Managed Identity Operator (AKS control plane -> its own kubelet identity)
   ]
   role_list = join(", ", local.assignable_role_ids)
 
@@ -70,12 +76,11 @@ resource "azurerm_user_assigned_identity" "this" {
 }
 
 resource "azurerm_federated_identity_credential" "github_env" {
-  name                = "github-env-client-${var.client}"
-  resource_group_name = var.resource_group_name
-  parent_id           = azurerm_user_assigned_identity.this.id
-  audience            = ["api://AzureADTokenExchange"]
-  issuer              = "https://token.actions.githubusercontent.com"
-  subject             = "repo:${var.github_repository}:environment:client-${var.client}"
+  name      = "github-env-client-${var.client}"
+  parent_id = azurerm_user_assigned_identity.this.id
+  audience  = ["api://AzureADTokenExchange"]
+  issuer    = "https://token.actions.githubusercontent.com"
+  subject   = "repo:${var.github_repository}:environment:client-${var.client}"
 }
 
 resource "azurerm_role_assignment" "contributor" {
@@ -132,12 +137,11 @@ resource "azurerm_user_assigned_identity" "plan" {
 }
 
 resource "azurerm_federated_identity_credential" "github_plan_env" {
-  name                = "github-env-client-${var.client}-plan"
-  resource_group_name = var.resource_group_name
-  parent_id           = azurerm_user_assigned_identity.plan.id
-  audience            = ["api://AzureADTokenExchange"]
-  issuer              = "https://token.actions.githubusercontent.com"
-  subject             = "repo:${var.github_repository}:environment:client-${var.client}-plan"
+  name      = "github-env-client-${var.client}-plan"
+  parent_id = azurerm_user_assigned_identity.plan.id
+  audience  = ["api://AzureADTokenExchange"]
+  issuer    = "https://token.actions.githubusercontent.com"
+  subject   = "repo:${var.github_repository}:environment:client-${var.client}-plan"
 }
 
 resource "azurerm_role_assignment" "plan_reader" {

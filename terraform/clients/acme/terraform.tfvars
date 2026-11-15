@@ -28,6 +28,16 @@ acr = {
 }
 app_image = "craiadvx7k2.azurecr.io/advisor-api@sha256:0000000000000000000000000000000000000000000000000000000000000000"
 
+# Private ingress: users reach acme.ai.<domain> over the hub (ExpressRoute/VPN or Front Door
+# Premium Private Link). P&T's DNS points the name at the App Gateway private IP (10.100.6.10).
+ingress = {
+  host_name             = "acme.ai.chatham.example.com"
+  certificate_secret_id = "https://kv-acme-prd-eus2-ab12.vault.azure.net/secrets/acme-ai-tls"
+  frontend_mode         = "private"
+  waf_mode              = "Prevention"
+  rate_limit_per_minute = 300
+}
+
 cost_center           = "AI-ADVISORY-ACME"
 owner_email           = "acme-engagement@example.com"
 budget_contact_emails = ["acme-engagement@example.com"]

@@ -1,0 +1,117 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: advisor
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: latest
+---
+# Workload identity: pods using this service account get Entra tokens as the client's app identity
+# (id-<client>-prd-<region>-app). The federated credential in Terraform trusts exactly
+# system:serviceaccount:advisor:advisor-api on THIS cluster's OIDC issuer.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: advisor-api
+  namespace: advisor
+  annotations:
+    azure.workload.identity/client-id: "<app_identity_client_id>"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: advisor-api
+  namespace: advisor
+data: # from `terraform output app_settings`
+  CLIENT_CODE: "<client>"
+  AZURE_OPENAI_ENDPOINT: "<openai_endpoint>"
+  AZURE_KEY_VAULT_URI: "<key_vault_uri>"
+  AZURE_STORAGE_BLOB_URL: "<blob_endpoint>"
+  AZURE_SEARCH_ENDPOINT: "<search_endpoint>"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: advisor-api
+  namespace: advisor
+spec:
+  replicas: 3
+  selector:
+    matchLabels: { app: advisor-api }
+  template:
+    metadata:
+      labels:
+        app: advisor-api
+        azure.workload.identity/use: "true" # injects AZURE_CLIENT_ID, AZURE_TENANT_ID, token file
+    spec:
+      serviceAccountName: advisor-api
+      # The workload identity webhook mounts its own short-lived Entra federation token; the
+      # Kubernetes API token isn't needed, so it isn't mounted.
+      automountServiceAccountToken: false
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels: { app: advisor-api }
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: api
+          image: "<acr_login_server>/advisor-api@sha256:<digest>" # same digest promoted ring by ring
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef: { name: advisor-api }
+          resources:
+            requests: { cpu: 250m, memory: 512Mi }
+            limits: { cpu: "1", memory: 1Gi }
+          readinessProbe:
+            httpGet: { path: /healthz, port: 8080 }
+          livenessProbe:
+            httpGet: { path: /healthz, port: 8080 }
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: ["ALL"] }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: advisor-api
+  namespace: advisor
+spec:
+  selector: { app: advisor-api }
+  ports:
+    - port: 80
+      targetPort: 8080
+---
+# TLS between App Gateway and NGINX uses the same certificate as the App Gateway listener, read
+# from the client's Key Vault by the app routing add-on (granted in Terraform).
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: advisor-api
+  namespace: advisor
+  annotations:
+    kubernetes.azure.com/tls-cert-keyvault-uri: "<certificate_secret_id>"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "180" # long LLM completions
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"   # stream tokens (SSE)
+spec:
+  ingressClassName: nginx-internal
+  tls:
+    - hosts: ["<host_name>"]
+      secretName: keyvault-advisor-api
+  rules:
+    - host: "<host_name>"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: advisor-api
+                port: { number: 80 }
