@@ -25,3 +25,10 @@ output "app_settings" {
 # Ingress
 output "ingress_private_ip" { value = try(module.ingress[0].private_ip, null) }
 output "ingress_public_ip" { value = try(module.ingress[0].public_ip, null) }
+
+# AI gateway
+output "ai_gateway_url" { value = try(module.ai_gateway[0].gateway_url, null) }
+output "ai_gateway_private_dns_zone_id" {
+  description = "Landing-zone mode: ask P&T to link this zone to the hub DNS resolver VNet."
+  value       = try(module.ai_gateway[0].private_dns_zone_id, null)
+}

@@ -26,6 +26,11 @@ engineering time** (elapsed time depends on P&T vending and AOAI quota).
 - [ ] GPU quota in the region if `aks.gpu_pool` is set
 - [ ] Flux configuration pointing at the client's rendered `kubernetes/` overlay
 
+## 1d. AI gateway (ADR 0012)
+- [ ] Decide SKU (Developer for pilots, Premium or Standard v2 for production) and token limits
+- [ ] Decide prompt/response body logging with the engagement lead (default off)
+- [ ] P&T: link the `<apim>.azure-api.net` private DNS zone to the hub resolver VNet (landing zone)
+
 ## 2. Request quota
 - [ ] Azure OpenAI quota for each model in `terraform.tfvars` in the target region and SKU
 - [ ] Note any data-residency or abuse-monitoring requirements from the client contract

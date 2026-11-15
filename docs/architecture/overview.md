@@ -131,7 +131,29 @@ flowchart TB
 Nodes use Azure CNI Overlay with Cilium. Egress goes through the hub firewall (UDR). P&T's Azure
 Policy runs inside the cluster through the Azure Policy add-on, and Flux deploys `kubernetes/`.
 
-## 6. What makes it multi-client without being shared
+## 6. AI gateway (ADR 0012)
+
+```mermaid
+sequenceDiagram
+  participant API as App (client sub)
+  participant GW as APIM AI gateway (internal, snet-apim)
+  participant CS as Content Safety (optional)
+  participant P as AOAI primary (PTU)
+  participant S as AOAI secondary (PAYG / 2nd region)
+  API->>GW: chat completion + Entra token (app identity)
+  GW->>GW: validate token, token limit per caller
+  GW->>CS: Prompt Shields
+  GW->>P: forward as gateway managed identity
+  P-->>GW: 429 (saturated)
+  GW->>S: failover (circuit breaker trips primary)
+  S-->>GW: completion
+  GW->>GW: emit token metric (Client, CallerAppId)
+  GW-->>API: completion + remaining-token headers
+```
+
+With the gateway on, the app has no role on the model accounts, so every call goes through it.
+
+## 7. What makes it multi-client without being shared
 | Layer | Shared across clients? | Why |
 |---|---|---|
 | Terraform modules and stamp | Yes (code) | Build once |
@@ -140,4 +162,5 @@ Policy runs inside the cluster through the Azure Policy add-on, and Flux deploys
 | Subscription, VNet, AOAI, KV, Storage, Search, logs | **No** | Isolation (ADR 0001) |
 | App Gateway, WAF policy, TLS certificate | **No** | Per-client edge, logs and blast radius (ADR 0010) |
 | AKS cluster (when used) | **No** | Dedicated cluster per client (ADR 0011) |
+| AI gateway (APIM) | **No** by default | Per client in the stamp; a shared APIM only for internal apps or with per-client workspace gateways (ADR 0012) |
 | Deployment identity, GitHub Environment | **No** | Pipeline blast radius (ADR 0008) |

@@ -2,6 +2,7 @@
 #
 #   x.x.0.0/24   snet-apps (Container Apps, delegated) or snet-aks (AKS nodes, CNI Overlay)
 #   x.x.1.0/26   snet-pe   private endpoints
+#   x.x.1.64/26  snet-apim API Management AI gateway, internal VNet mode (ADR 0012)
 #   x.x.2.0/24   snet-agw  Application Gateway WAF_v2 (dedicated; App Gateway needs its own subnet)
 #   x.x.3.0/24   reserved  (second node pool subnet, AGC, growth)
 
@@ -9,11 +10,17 @@ locals {
   workload_prefix = cidrsubnet(var.address_space, 2, 0)
   pe_prefix       = cidrsubnet(var.address_space, 4, 4)
   agw_prefix      = cidrsubnet(var.address_space, 2, 2)
+  apim_prefix     = cidrsubnet(var.address_space, 4, 5)
   is_aca          = var.compute_platform == "container_apps"
 
   # Sources allowed to reach private endpoints: the workload subnet, plus App Gateway (it reads
   # its TLS certificate from Key Vault over the vault's private endpoint).
-  pe_allowed_sources = concat([local.workload_prefix], var.enable_ingress_subnet ? [local.agw_prefix] : [])
+  # And the AI gateway, which calls Azure OpenAI and Content Safety over their private endpoints.
+  pe_allowed_sources = concat(
+    [local.workload_prefix],
+    var.enable_ingress_subnet ? [local.agw_prefix] : [],
+    var.enable_apim_subnet ? [local.apim_prefix] : [],
+  )
 }
 
 resource "azurerm_virtual_network" "this" {
@@ -57,6 +64,14 @@ resource "azurerm_subnet" "agw" {
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.this.name
   address_prefixes     = [local.agw_prefix]
+}
+
+resource "azurerm_subnet" "apim" {
+  count                = var.enable_apim_subnet ? 1 : 0
+  name                 = "snet-apim"
+  resource_group_name  = var.resource_group_name
+  virtual_network_name = azurerm_virtual_network.this.name
+  address_prefixes     = [local.apim_prefix]
 }
 
 # ---- NSGs
@@ -166,6 +181,70 @@ resource "azurerm_network_security_group" "agw" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
+}
+
+# API Management internal VNet mode: management endpoint (ApiManagement:3443), the Azure load
+# balancer probe (6390), and HTTPS from inside the VNet only.
+resource "azurerm_network_security_group" "apim" {
+  count               = var.enable_apim_subnet ? 1 : 0
+  name                = var.nsg_apim_name
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  tags                = var.tags
+
+  security_rule {
+    name                       = "allow-apim-management"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "3443"
+    source_address_prefix      = "ApiManagement"
+    destination_address_prefix = "VirtualNetwork"
+  }
+
+  security_rule {
+    name                       = "allow-azure-load-balancer"
+    priority                   = 110
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "6390"
+    source_address_prefix      = "AzureLoadBalancer"
+    destination_address_prefix = "VirtualNetwork"
+  }
+
+  security_rule {
+    name                       = "allow-https-from-workload"
+    priority                   = 200
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "443"
+    source_address_prefix      = local.workload_prefix
+    destination_address_prefix = local.apim_prefix
+  }
+
+  security_rule {
+    name                       = "deny-all-other-inbound"
+    priority                   = 4000
+    direction                  = "Inbound"
+    access                     = "Deny"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+}
+
+resource "azurerm_subnet_network_security_group_association" "apim" {
+  count                     = var.enable_apim_subnet ? 1 : 0
+  subnet_id                 = azurerm_subnet.apim[0].id
+  network_security_group_id = azurerm_network_security_group.apim[0].id
 }
 
 resource "azurerm_subnet_network_security_group_association" "workload" {

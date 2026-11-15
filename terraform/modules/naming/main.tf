@@ -75,5 +75,8 @@ output "names" {
     aks                       = "aks-${local.base}"
     aks_node_rg               = "rg-${local.base}-aks-nodes"
     identity_aks_cp           = "id-${local.base}-aks-cp"
+    ai_gateway                = "apim-${local.base}-${local.suffix}"
+    nsg_apim                  = "nsg-${local.base}-apim"
+    content_safety            = "cs-${local.base}-${local.suffix}"
   }
 }

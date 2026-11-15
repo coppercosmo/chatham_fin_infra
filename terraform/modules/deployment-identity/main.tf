@@ -42,6 +42,7 @@ locals {
     "b12aa53e-6015-4669-85d0-8515ebb3ae7f", # Private DNS Zone Contributor
     "7f6c6a51-bcf8-42ba-9220-52d62157d7db", # Azure Kubernetes Service RBAC Reader
     "f1a07417-d97a-45cb-824c-7a7467783830", # Managed Identity Operator (AKS control plane -> its own kubelet identity)
+    "a97b65f3-24c7-4388-baec-2e87135dc908", # Cognitive Services User (AI gateway -> Content Safety, ADR 0012)
   ]
   role_list = join(", ", local.assignable_role_ids)
 

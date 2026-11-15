@@ -26,6 +26,12 @@ mock_provider "azurerm" {
       }]
     }
   }
+  mock_resource "azurerm_api_management" {
+    defaults = {
+      gateway_url          = "https://apim-testco-prd-eus2-ab12.azure-api.net"
+      private_ip_addresses = ["10.100.1.68"]
+    }
+  }
   mock_resource "azurerm_container_app_environment" {
     defaults = {
       default_domain    = "happy-sky-123.eastus2.azurecontainerapps.io"
@@ -175,5 +181,37 @@ run "aks_ingress_targets_internal_nginx" {
   assert {
     condition     = output.aks_ingress_internal_ip == "10.100.0.250"
     error_message = "AKS ingress must use the static internal LB IP App Gateway targets."
+  }
+}
+
+run "ai_gateway_is_internal_and_the_only_path_to_models" {
+  command = plan
+
+  variables {
+    ai_gateway = {
+      enable_content_safety = true
+    }
+  }
+
+  assert {
+    condition     = module.ai_gateway[0].virtual_network_type == "Internal"
+    error_message = "The AI gateway must run in internal VNet mode (private VIP only)."
+  }
+  assert {
+    condition     = !contains(module.app_identity.role_keys, "openai")
+    error_message = "With the gateway on, the app must not have direct Azure OpenAI access (no bypass)."
+  }
+  assert {
+    condition     = contains(keys(azurerm_private_dns_zone.this), "cognitiveservices")
+    error_message = "Content Safety needs its privatelink zone in standalone mode."
+  }
+}
+
+run "without_gateway_app_calls_model_directly" {
+  command = plan
+
+  assert {
+    condition     = contains(module.app_identity.role_keys, "openai") && length(module.ai_gateway) == 0
+    error_message = "Without the gateway the app keeps its direct, least-privilege model role."
   }
 }

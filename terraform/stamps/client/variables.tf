@@ -140,6 +140,24 @@ variable "aks" {
   default = {}
 }
 
+# ---------- AI gateway (ADR 0012)
+variable "ai_gateway" {
+  description = "Azure API Management AI gateway between the app and Azure OpenAI. null = app calls AOAI directly."
+  type = object({
+    sku_name                 = optional(string, "Developer_1")
+    tokens_per_minute        = optional(number, 50000)
+    monthly_token_quota      = optional(number, 0)
+    enable_content_safety    = optional(bool, false)
+    log_request_bodies_bytes = optional(number, 0)
+    additional_backends = optional(list(object({
+      name        = string
+      url         = string
+      resource_id = string
+    })), [])
+  })
+  default = null
+}
+
 # ---------- Ingress (ADR 0010)
 variable "ingress" {
   description = "Per-client Application Gateway WAF_v2. null = no ingress (internal-only/demo)."

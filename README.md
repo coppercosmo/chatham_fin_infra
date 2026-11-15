@@ -32,6 +32,9 @@ Log Analytics + App Insights, budget alerts, and delete locks. Two per-client ch
   (`compute_platform = "aks"`, ADR 0011).
 - **Ingress**: an Application Gateway WAF_v2 with a private frontend (or a locked-down public one),
   TLS end to end with certificates from the client's Key Vault (`ingress = {...}`, ADR 0010).
+- **AI gateway**: an internal API Management AI gateway between the app and its models, with
+  per-caller token limits, token metering, backend failover and optional Prompt Shields
+  (`ai_gateway = {...}`, ADR 0012).
 
 ## Repo layout
 | Path | What |
@@ -40,7 +43,7 @@ Log Analytics + App Insights, budget alerts, and delete locks. Two per-client ch
 | `docs/architecture/` | Diagrams: estate, stamp, request path ([overview](docs/architecture/overview.md)) |
 | `docs/runbooks/` | Onboard / offboard a client, incident runbook |
 | `docs/interview/` | Topic map, likely questions, 30/60/90, AI tooling notes |
-| `terraform/modules/` | Reusable modules: naming, spoke-network, private-endpoint, key-vault, storage, ai-services, container-apps, aks, app-gateway, observability, workload-identity, deployment-identity |
+| `terraform/modules/` | Reusable modules: naming, spoke-network, private-endpoint, key-vault, storage, ai-services, ai-gateway, container-apps, aks, app-gateway, observability, workload-identity, deployment-identity |
 | `terraform/stamps/client/` | Root module: one complete isolated client environment, plus offline tests |
 | `terraform/platform/` | Shared platform subscription: state, ACR, per-client CI identities |
 | `terraform/clients/<code>/` | Per-client `terraform.tfvars`, `backend.hcl`, `client.json` (ring) |
@@ -91,4 +94,5 @@ access. Per-client plan, ring deploy and drift jobs stay off until the repositor
   live subscription. The client configs use placeholder subscription and object IDs.
 - Known gaps, not built yet: self-hosted runners for private data-plane access, Azure
   Monitor Private Link Scope, customer-managed keys per client, a Front Door Premium edge for
-  internet-facing multi-region clients, and Flux configuration for the AKS path.
+  internet-facing multi-region clients, Flux configuration for the AKS path, and two AI gateway
+  settings azurerm 4.81 doesn't expose yet (load-balanced backend pools, App Insights custom metrics).

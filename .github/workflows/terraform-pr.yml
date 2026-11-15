@@ -32,6 +32,11 @@ jobs:
           terraform validate
       - name: offline tests + type-check every client config (mocked provider)
         run: scripts/test-client-configs.sh
+      - name: module tests (mocked provider)
+        run: |
+          for t in terraform/modules/*/tests; do
+            (cd "$(dirname "$t")" && terraform init -backend=false -input=false && terraform test)
+          done
       - uses: terraform-linters/setup-tflint@v4
       - run: tflint --init && tflint --recursive
       - name: checkov (policy as code, mirrors P&T guardrails)
