@@ -67,5 +67,13 @@ output "names" {
     container_app_api         = "ca-${var.client}-api"
     identity_app              = "id-${local.base}-app"
     budget                    = "budget-${local.base}"
+    app_gateway               = "agw-${local.base}"
+    waf_policy                = "waf-${local.base}"
+    identity_agw              = "id-${local.base}-agw"
+    public_ip_agw             = "pip-${local.base}-agw"
+    nsg_agw                   = "nsg-${local.base}-agw"
+    aks                       = "aks-${local.base}"
+    aks_node_rg               = "rg-${local.base}-aks-nodes"
+    identity_aks_cp           = "id-${local.base}-aks-cp"
   }
 }

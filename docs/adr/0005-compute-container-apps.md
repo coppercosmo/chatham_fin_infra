@@ -1,6 +1,6 @@
 # ADR 0005: Azure Container Apps (internal) as default compute
 
-- Status: Accepted
+- Status: Accepted, amended by [ADR 0011](0011-aks-hosting-option.md) (AKS as a per-client option)
 - Date: 2026-11-13
 
 ## Context

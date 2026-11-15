@@ -102,6 +102,63 @@ variable "search_replica_count" {
   description = "3 meets the AI Search read/write SLA. Use 1 for internal or non-production clients."
 }
 
+# ---------- Compute (ADR 0005, 0011)
+variable "compute_platform" {
+  type        = string
+  default     = "container_apps"
+  description = "container_apps (default) or aks (dedicated private cluster for this client)."
+  validation {
+    condition     = contains(["container_apps", "aks"], var.compute_platform)
+    error_message = "compute_platform must be container_apps or aks."
+  }
+}
+
+variable "aks" {
+  description = "AKS settings, used when compute_platform = aks."
+  type = object({
+    kubernetes_version     = optional(string)
+    private_dns_zone_id    = optional(string, "System")
+    admin_group_object_ids = optional(list(string), [])
+    app_namespace          = optional(string, "advisor")
+    app_service_account    = optional(string, "advisor-api")
+    system_pool = optional(object({
+      vm_size   = optional(string, "Standard_D4ds_v5")
+      min_count = optional(number, 3)
+      max_count = optional(number, 5)
+    }), {})
+    user_pool = optional(object({
+      vm_size   = optional(string, "Standard_D8ds_v5")
+      min_count = optional(number, 2)
+      max_count = optional(number, 10)
+    }), {})
+    gpu_pool = optional(object({
+      vm_size   = optional(string, "Standard_NC24ads_A100_v4")
+      min_count = optional(number, 0)
+      max_count = optional(number, 2)
+    }))
+  })
+  default = {}
+}
+
+# ---------- Ingress (ADR 0010)
+variable "ingress" {
+  description = "Per-client Application Gateway WAF_v2. null = no ingress (internal-only/demo)."
+  type = object({
+    host_name                   = string
+    certificate_secret_id       = string # versionless Key Vault secret ID in THIS client's vault
+    frontend_mode               = optional(string, "private")
+    allowed_source_prefixes     = optional(list(string), ["VirtualNetwork"])
+    allowed_client_cidrs        = optional(list(string), [])
+    waf_mode                    = optional(string, "Prevention")
+    waf_prompt_field_exclusions = optional(list(string), ["messages", "prompt", "input"])
+    rate_limit_per_minute       = optional(number, 600)
+    min_capacity                = optional(number, 1)
+    max_capacity                = optional(number, 5)
+    health_probe_path           = optional(string, "/healthz")
+  })
+  default = null
+}
+
 # ---------- App (ADR 0005, 0008)
 variable "app_image" {
   type        = string

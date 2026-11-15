@@ -13,6 +13,19 @@ mock_provider "azurerm" {
       id = "/subscriptions/11111111-1111-1111-1111-111111111111"
     }
   }
+  mock_resource "azurerm_kubernetes_cluster" {
+    defaults = {
+      oidc_issuer_url = "https://eastus2.oic.prod-aks.azure.com/00000000-0000-0000-0000-000000000000/11111111-1111-1111-1111-111111111111/"
+      web_app_routing = [{
+        dns_zone_ids = []
+        web_app_routing_identity = [{
+          object_id                 = "44444444-4444-4444-4444-444444444444"
+          client_id                 = "55555555-5555-5555-5555-555555555555"
+          user_assigned_identity_id = "/subscriptions/11111111-1111-1111-1111-111111111111/resourceGroups/rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/webapprouting"
+        }]
+      }]
+    }
+  }
   mock_resource "azurerm_container_app_environment" {
     defaults = {
       default_domain    = "happy-sky-123.eastus2.azurecontainerapps.io"
@@ -88,4 +101,79 @@ run "client_code_is_validated" {
   }
 
   expect_failures = [var.client]
+}
+
+run "aks_cluster_is_private_entra_only_with_network_policy" {
+  command = plan
+
+  variables {
+    compute_platform  = "aks"
+    connectivity_mode = "landing_zone"
+    hub = {
+      vnet_id             = "/subscriptions/33333333-3333-3333-3333-333333333333/resourceGroups/rg-hub/providers/Microsoft.Network/virtualNetworks/vnet-hub"
+      firewall_private_ip = "10.0.0.4"
+      dns_servers         = ["10.0.1.4"]
+    }
+  }
+
+  assert {
+    condition     = length(module.apps) == 0 && length(module.aks) == 1
+    error_message = "compute_platform = aks must build a cluster and no Container Apps environment."
+  }
+  assert {
+    condition     = module.aks[0].private_cluster_enabled && module.aks[0].local_account_disabled
+    error_message = "AKS API server must be private and local (non-Entra) accounts disabled."
+  }
+  assert {
+    condition     = module.aks[0].network_policy == "cilium"
+    error_message = "AKS must enforce network policy."
+  }
+  assert {
+    condition     = module.aks[0].outbound_type == "userDefinedRouting"
+    error_message = "In the landing zone, cluster egress must go through the hub firewall."
+  }
+}
+
+run "private_ingress_with_waf_in_prevention" {
+  command = plan
+
+  variables {
+    connectivity_mode = "standalone"
+    ingress = {
+      host_name             = "testco.ai.example.com"
+      certificate_secret_id = "https://kv-testco.vault.azure.net/secrets/testco-tls"
+    }
+  }
+
+  assert {
+    condition     = module.ingress[0].frontend_mode == "private" && module.ingress[0].public_ip == null
+    error_message = "Ingress must default to a private frontend with no public IP."
+  }
+  assert {
+    condition     = module.ingress[0].waf_mode == "Prevention"
+    error_message = "WAF must default to Prevention mode."
+  }
+  assert {
+    condition     = module.ingress[0].private_ip == "10.100.2.10"
+    error_message = "App Gateway private frontend must sit in the dedicated snet-agw subnet."
+  }
+}
+
+run "aks_ingress_targets_internal_nginx" {
+  command = plan
+
+  variables {
+    compute_platform = "aks"
+    ingress = {
+      host_name             = "testco.ai.example.com"
+      certificate_secret_id = "https://kv-testco.vault.azure.net/secrets/testco-tls"
+      frontend_mode         = "public"
+      allowed_client_cidrs  = ["203.0.113.0/24"]
+    }
+  }
+
+  assert {
+    condition     = output.aks_ingress_internal_ip == "10.100.0.250"
+    error_message = "AKS ingress must use the static internal LB IP App Gateway targets."
+  }
 }

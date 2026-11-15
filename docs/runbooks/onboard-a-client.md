@@ -10,6 +10,22 @@ engineering time** (elapsed time depends on P&T vending and AOAI quota).
 - [ ] Budget owner and cost center
 - [ ] Hub peering accepted on the hub side, firewall rules for required egress
 
+## 1b. Ingress prerequisites (ADR 0010)
+- [ ] Host name `<client>.ai.<domain>` and its certificate (from P&T's CA process or Key Vault's
+      integrated CA); import it into the client vault after the first apply, then set the
+      versionless secret ID in `ingress.certificate_secret_id`
+- [ ] Decide `frontend_mode`: private (default) or public with the client's egress CIDRs
+- [ ] P&T: DNS record to the gateway's private IP (`x.x.2.10`) or Front Door Private Link setup
+- [ ] Subscription feature for private-only App Gateway deployment registered (vending template)
+
+## 1c. AKS only (ADR 0011)
+- [ ] Written reason for AKS in the client config (GPU, operators, client requirement)
+- [ ] P&T: `sg-aiadv-<client>-aks-admins` group (PIM-eligible)
+- [ ] P&T: `Private DNS Zone Contributor` on `privatelink.<region>.azmk8s.io` for the cluster's
+      control-plane identity (output after a targeted apply of the identity)
+- [ ] GPU quota in the region if `aks.gpu_pool` is set
+- [ ] Flux configuration pointing at the client's rendered `kubernetes/` overlay
+
 ## 2. Request quota
 - [ ] Azure OpenAI quota for each model in `terraform.tfvars` in the target region and SKU
 - [ ] Note any data-residency or abuse-monitoring requirements from the client contract

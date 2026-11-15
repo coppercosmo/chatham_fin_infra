@@ -25,3 +25,30 @@ variable "hub" {
   })
   default = null
 }
+
+variable "compute_platform" {
+  type        = string
+  default     = "container_apps"
+  description = "container_apps: workload subnet delegated to Microsoft.App. aks: plain subnet for AKS nodes (Azure CNI Overlay)."
+  validation {
+    condition     = contains(["container_apps", "aks"], var.compute_platform)
+    error_message = "compute_platform must be container_apps or aks."
+  }
+}
+
+variable "enable_ingress_subnet" {
+  type        = bool
+  default     = false
+  description = "Create the dedicated Application Gateway subnet."
+}
+
+variable "nsg_agw_name" {
+  type    = string
+  default = null
+}
+
+variable "ingress_allowed_source_prefixes" {
+  type        = list(string)
+  default     = ["VirtualNetwork"]
+  description = "Who may reach the Application Gateway on 443. Private ingress: VirtualNetwork (hub, ExpressRoute/VPN). Public ingress: client egress CIDRs or the AzureFrontDoor.Backend service tag."
+}

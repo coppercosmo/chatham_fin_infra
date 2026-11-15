@@ -30,14 +30,14 @@ jobs:
         run: |
           terraform init -backend=false
           terraform validate
-          terraform test
+      - name: offline tests + type-check every client config (mocked provider)
+        run: scripts/test-client-configs.sh
       - uses: terraform-linters/setup-tflint@v4
       - run: tflint --init && tflint --recursive
       - name: checkov (policy as code, mirrors P&T guardrails)
         uses: bridgecrewio/checkov-action@v12
         with:
-          directory: terraform
-          framework: terraform
+          directory: . # Terraform, Kubernetes manifests and these workflows
           quiet: true
           soft_fail: false  # blocking: every accepted risk is an inline #checkov:skip with its reason
       - id: affected
