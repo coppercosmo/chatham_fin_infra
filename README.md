@@ -23,6 +23,10 @@ flowchart LR
   PLAT -. deploys .-> A & B & C
 ```
 
+**Full picture:** [docs/architecture/diagram/solution-architecture.svg](docs/architecture/diagram/solution-architecture.svg) shows every component for three example clients side by side (governance, hub, each client stamp, the shared platform subscription and the delivery pipeline). It is generated from [generate.py](docs/architecture/diagram/generate.py).
+
+[![Multi-client solution architecture](docs/architecture/diagram/solution-architecture.svg)](docs/architecture/diagram/solution-architecture.svg)
+
 ## What a client gets (the "stamp")
 Spoke VNet peered to the hub, everything private: Azure OpenAI (data-zone deployments, keys off),
 AI Search, Storage, Key Vault, a user-assigned managed identity with resource-scoped roles, its own
@@ -40,7 +44,7 @@ Log Analytics + App Insights, budget alerts, and delete locks. Two per-client ch
 | Path | What |
 |---|---|
 | `docs/adr/` | Architecture decisions and trade-offs ([index](docs/adr/README.md)) |
-| `docs/architecture/` | Diagrams: estate, stamp, request path ([overview](docs/architecture/overview.md)) |
+| `docs/architecture/` | Diagrams: estate, stamp, request path ([overview](docs/architecture/overview.md)); full multi-client diagram in `diagram/` |
 | `docs/runbooks/` | Onboard / offboard a client, incident runbook |
 | `docs/interview/` | Topic map, likely questions, 30/60/90, AI tooling notes |
 | `terraform/modules/` | Reusable modules: naming, spoke-network, private-endpoint, key-vault, storage, ai-services, ai-gateway, container-apps, aks, app-gateway, observability, workload-identity, deployment-identity |

@@ -1,5 +1,17 @@
 # Architecture overview
 
+The full multi-client diagram, with every component for three example clients, is
+[diagram/solution-architecture.svg](diagram/solution-architecture.svg) (PNG:
+[solution-architecture.png](diagram/solution-architecture.png)). The sections below break it down
+piece by piece.
+
+To change it, edit [diagram/generate.py](diagram/generate.py) and regenerate:
+
+```bash
+python3 docs/architecture/diagram/generate.py
+NODE_PATH=$(npm root -g) node docs/architecture/diagram/render-png.mjs   # PNG, needs Playwright
+```
+
 ## 1. Where this sits in Chatham's Azure estate
 
 ```mermaid

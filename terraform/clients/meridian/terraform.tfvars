@@ -40,6 +40,16 @@ model_deployments = {
   embeddings = { model_name = "text-embedding-3-large", model_version = "1", sku = "DataZoneStandard", capacity = 30 }
 }
 
+ai_gateway = {
+  sku_name          = "Premium_1"
+  tokens_per_minute = 30000
+  additional_backends = [{
+    name        = "aoai-centralus"
+    url         = "https://oai-meridian-prd-cus-ef56.openai.azure.com/"
+    resource_id = "/subscriptions/55555555-5555-5555-5555-555555555555/resourceGroups/rg-meridian-prd-cus/providers/Microsoft.CognitiveServices/accounts/oai-meridian-prd-cus-ef56"
+  }]
+}
+
 acr = {
   id           = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-aiadv-platform/providers/Microsoft.ContainerRegistry/registries/craiadvx7k2"
   login_server = "craiadvx7k2.azurecr.io"
