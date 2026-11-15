@@ -16,6 +16,12 @@ model_deployments = {
   chat = { model_name = "gpt-4o-mini", model_version = "2024-07-18", capacity = 10 }
 }
 
+# Ring 0 pilot of the AI gateway (ADR 0012): cheap Developer SKU, generous limits, measure overhead.
+ai_gateway = {
+  sku_name          = "Developer_1"
+  tokens_per_minute = 100000
+}
+
 cost_center        = "AI-ADVISORY"
 owner_email        = "platform@example.com"
 monthly_budget_usd = 300
