@@ -30,11 +30,11 @@ jobs:
         run: |
           terraform init -backend=false
           terraform validate
-      - name: offline tests + type-check every client config (mocked provider)
+      - name: stamp tests for every tier + type-check every client, cell and pool config (mocked provider)
         run: scripts/test-client-configs.sh
-      - name: module tests (mocked provider)
+      - name: module and exercise tests (mocked provider)
         run: |
-          for t in terraform/modules/*/tests; do
+          for t in terraform/modules/*/tests terraform/exercises/*/tests; do
             (cd "$(dirname "$t")" && terraform init -backend=false -input=false && terraform test)
           done
       - name: reference hub (P&T owns the real one) validate + test with the example clients

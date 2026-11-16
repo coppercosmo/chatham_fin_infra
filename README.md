@@ -5,6 +5,15 @@ A reference design and runnable Terraform for hosting AI solutions **once** and 
 inside a central Platform Engineering team's landing zone (policies, Entra groups, hub
 networking), not around it.
 
+**Three isolation tiers** ([ADR 0014](docs/adr/0014-isolation-tiers.md), proposed;
+[design, diagrams and cost math](docs/architecture/isolation-tiers.md)):
+
+| Tier | What's shared | What's per client | Fixed cost (approx. USD/month) | Terraform |
+|---|---|---|---|---|
+| 1. Dedicated (default) | Only P&T's hub | Everything, in its own subscription | ~1,500 per client | `stamps/client` |
+| 2. Shared cell | Front door, compute, AI gateway, search service | Data, keys, model account, logs, identities, in its own resource group | ~170 per client | `stamps/cell` + `stamps/cell-client` |
+| 3. Pooled (internal/public data) | One app and model account | Container, index, encryption scope, group, ingestion identity; the app reads with the user's token | ~45 per tenant | `stamps/pool` |
+
 ```mermaid
 flowchart LR
   subgraph PT["Platform Engineering (owns guardrails)"]
@@ -53,14 +62,18 @@ Log Analytics + App Insights, budget alerts, and delete locks. Two per-client ch
 | `docs/adr/` | Architecture decisions and trade-offs ([index](docs/adr/README.md)) |
 | `docs/architecture/` | Diagrams: estate, stamp, request path ([overview](docs/architecture/overview.md)); [client network connectivity](docs/architecture/client-connectivity.md); full multi-client diagram in `diagram/` |
 | `docs/runbooks/` | Onboard / offboard a client, connect a client's network, incident runbooks |
-| `docs/interview/` | Topic map, likely questions, 30/60/90, AI tooling notes |
-| `terraform/modules/` | Reusable modules: naming, spoke-network, private-endpoint, key-vault, storage, ai-services, ai-gateway, container-apps, aks, app-gateway, observability, workload-identity, deployment-identity, cidr-overlap, and hub-connectivity (proposed to Platform Engineering) |
-| `terraform/stamps/client/` | Root module: one complete isolated client environment, plus offline tests |
+| `docs/interview/` | [Study guide](docs/interview/README.md): topic map, deep dives, mock technical test, repo walkthrough, likely questions, 30/60/90 |
+| `terraform/modules/` | Reusable modules: naming, spoke-network, private-endpoint, key-vault, storage, ai-services, ai-gateway, container-apps, aks, app-gateway, shared-app-gateway, observability, workload-identity, deployment-identity, cidr-overlap, policy-guardrails, and hub-connectivity (the last two proposed to Platform Engineering) |
+| `terraform/stamps/client/` | Tier 1 root module: one complete isolated client environment, plus offline tests |
+| `terraform/stamps/cell/`, `terraform/stamps/cell-client/` | Tier 2: the shared cell (per-client resource groups, sites, apps, gateway APIs) and each client's data in its own resource group |
+| `terraform/stamps/pool/` | Tier 3: the pooled app with per-tenant containers, indexes, identities and jobs |
 | `terraform/platform/` | Shared platform subscription: state, ACR, per-client CI identities |
 | `terraform/hub/` | Reference connectivity hub (Platform Engineering owns the real one): gateways, firewall, DNS resolver, wired to `hub-connectivity` |
 | `terraform/clients/<code>/` | Per-client `terraform.tfvars`, `backend.hcl`, `client.json` (ring) |
+| `terraform/cells/<cell>/`, `terraform/pools/<pool>/` | Example Tier 2 and Tier 3 configs (`cells/cell01/clients/<client>.tfvars` per cell client) |
+| `terraform/exercises/` | Interview practice: a from-scratch VNet + private endpoints + private DNS, with tests |
 | `kubernetes/` | AKS path: internal NGINX controller, app with workload identity, default-deny network policy |
-| `policy/` | AI guardrail policy definitions proposed to Platform Engineering |
+| `policy/` | Guardrail policy definitions proposed to Platform Engineering, deployable as one initiative with `terraform/modules/policy-guardrails` |
 | `.github/workflows/` | PR checks + per-client plans, ring-based apply, nightly drift |
 
 ## Try it
@@ -71,7 +84,7 @@ terraform init -backend=false
 terraform validate
 terraform test          # mocked provider; asserts isolation/security properties
 cd ../../..
-scripts/test-client-configs.sh   # also type-checks every client config in terraform/clients
+scripts/test-client-configs.sh   # every stamp's tests, plus a type-check of every config in clients/, cells/ and pools/
 cd terraform/hub && terraform init -backend=false && terraform test -var-file=terraform.tfvars.example
 ```
 
@@ -105,6 +118,13 @@ access. Per-client plan, ring deploy and drift jobs stay off until the repositor
 ## Status and known gaps
 - Validated with Terraform 1.9.8 and azurerm 4.81; all offline tests pass. Not yet applied to a
   live subscription. The client configs use placeholder subscription and object IDs.
+- Tiers 2 and 3 (ADR 0014) are proposed: designed, built and tested offline, with open questions for
+  P&T (two narrow custom roles per cell) and for Chatham's risk team (whether contracts accept a
+  shared cell for confidential data). Their cost depends most on whether Standard v2 API Management
+  works for the internal gateway; the Terraform uses Developer or Premium today.
+- ADR 0009 describes metric alerts deployed by the stamp; the observability module doesn't create
+  them yet. The design for them, and for using them to gate ring promotion, is in
+  [docs/interview/deep-dives/observability-per-client.md](docs/interview/deep-dives/observability-per-client.md).
 - Known gap found while building ADR 0013: Microsoft now requires subnet delegation to
   `Microsoft.Network/applicationGateways` for private-only App Gateway deployments, which
   `snet-agw` doesn't set yet for `frontend_mode = "private"` without Private Link.
