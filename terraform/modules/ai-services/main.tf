@@ -49,6 +49,7 @@ resource "azurerm_cognitive_deployment" "this" {
 }
 
 resource "azurerm_search_service" "this" {
+  #checkov:skip=CKV_AZURE_208:Replica count is a per-stamp cost choice (search_replica_count): 2 gives the query SLA, 3 adds the index-update SLA. Ingestion is batch and retries.
   count                         = var.enable_search ? 1 : 0
   name                          = var.search_name
   location                      = var.location

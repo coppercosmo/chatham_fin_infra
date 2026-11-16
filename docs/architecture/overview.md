@@ -1,5 +1,9 @@
 # Architecture overview
 
+This page describes Tier 1, the dedicated subscription-per-client stamp. The two cheaper tiers (a
+shared cell and a pooled app) are in [isolation-tiers.md](isolation-tiers.md), with their own diagrams
+([tier2-shared-cell.svg](diagram/tier2-shared-cell.svg), [tier3-pooled.svg](diagram/tier3-pooled.svg)).
+
 The full multi-client diagram, with every component for three example clients, is
 [diagram/solution-architecture.svg](diagram/solution-architecture.svg) (PNG:
 [solution-architecture.png](diagram/solution-architecture.png); editable draw.io versions below).
@@ -28,9 +32,12 @@ source (export the SVG/PNG from draw.io with File > Export).
 To change it in code, edit [diagram/generate.py](diagram/generate.py) and regenerate:
 
 ```bash
-python3 docs/architecture/diagram/generate.py
-NODE_PATH=$(npm root -g) node docs/architecture/diagram/render-png.mjs   # PNG, needs Playwright
+python3 docs/architecture/diagram/generate.py         # Tier 1 solution architecture
+python3 docs/architecture/diagram/generate_tiers.py   # Tier 2 and Tier 3 diagrams
+NODE_PATH=$(npm root -g) node docs/architecture/diagram/render-png.mjs solution-architecture tier2-shared-cell tier3-pooled   # PNGs, needs Playwright
 ```
+
+Both generators share the drawing helpers, palette and Azure icons in [diagram/drawlib.py](diagram/drawlib.py).
 
 ## 1. Where this sits in Chatham's Azure estate
 

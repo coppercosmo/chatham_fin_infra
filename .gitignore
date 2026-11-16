@@ -10,4 +10,5 @@ override.tf.json
 *_override.tf
 .terraformrc
 terraform.rc
-terraform/stamps/client/tests/client_*.tftest.hcl
+terraform/stamps/*/tests/config_*.tftest.hcl
+__pycache__/

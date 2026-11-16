@@ -17,6 +17,10 @@ locals {
     quota          = var.monthly_token_quota
     content_safety = var.enable_content_safety
     backends       = local.backend_names
+    audiences      = var.audiences
+    pooled         = var.tenancy != null
+    role_prefix    = try(var.tenancy.role_prefix, "Tenant.")
+    caller_tenants = try(var.tenancy.caller_tenants, {})
   })
 }
 
