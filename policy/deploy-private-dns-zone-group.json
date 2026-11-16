@@ -1,0 +1,99 @@
+{
+  "properties": {
+    "displayName": "AI Advisory: register private endpoints in the hub's private DNS zones",
+    "description": "DeployIfNotExists: when a private endpoint for the given resource type and sub-resource (groupId) is created without a DNS zone group, deploy one that points at the central privatelink zones in P&T's hub. This is why the client stamp leaves DNS zone groups alone in landing_zone mode (ADR 0002, 0003). Same pattern as the Azure Landing Zones 'Deploy-Private-DNS-Generic' policy.",
+    "mode": "Indexed",
+    "policyRule": {
+      "if": {
+        "allOf": [
+          { "field": "type", "equals": "Microsoft.Network/privateEndpoints" },
+          {
+            "count": {
+              "field": "Microsoft.Network/privateEndpoints/privateLinkServiceConnections[*]",
+              "where": {
+                "allOf": [
+                  {
+                    "field": "Microsoft.Network/privateEndpoints/privateLinkServiceConnections[*].privateLinkServiceId",
+                    "contains": "[concat('/providers/', parameters('resourceType'), '/')]"
+                  },
+                  {
+                    "field": "Microsoft.Network/privateEndpoints/privateLinkServiceConnections[*].groupIds[*]",
+                    "equals": "[parameters('groupId')]"
+                  }
+                ]
+              }
+            },
+            "greaterOrEquals": 1
+          }
+        ]
+      },
+      "then": {
+        "effect": "[parameters('effect')]",
+        "details": {
+          "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
+          "roleDefinitionIds": ["/providers/Microsoft.Authorization/roleDefinitions/4d97b98b-1d4f-4787-a291-c67834d212e7"],
+          "deployment": {
+            "properties": {
+              "mode": "incremental",
+              "template": {
+                "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                "contentVersion": "1.0.0.0",
+                "parameters": {
+                  "privateDnsZoneIds": { "type": "array" },
+                  "privateEndpointName": { "type": "string" },
+                  "location": { "type": "string" }
+                },
+                "resources": [
+                  {
+                    "name": "[concat(parameters('privateEndpointName'), '/deployedByPolicy')]",
+                    "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
+                    "apiVersion": "2023-04-01",
+                    "location": "[parameters('location')]",
+                    "properties": {
+                      "copy": [
+                        {
+                          "name": "privateDnsZoneConfigs",
+                          "count": "[length(parameters('privateDnsZoneIds'))]",
+                          "input": {
+                            "name": "[replace(last(split(parameters('privateDnsZoneIds')[copyIndex('privateDnsZoneConfigs')], '/')), '.', '-')]",
+                            "properties": {
+                              "privateDnsZoneId": "[parameters('privateDnsZoneIds')[copyIndex('privateDnsZoneConfigs')]]"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "parameters": {
+                "privateDnsZoneIds": { "value": "[parameters('privateDnsZoneIds')]" },
+                "privateEndpointName": { "value": "[field('name')]" },
+                "location": { "value": "[field('location')]" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "parameters": {
+      "resourceType": {
+        "type": "String",
+        "metadata": { "description": "Resource provider type the endpoint connects to, e.g. Microsoft.KeyVault/vaults" }
+      },
+      "groupId": {
+        "type": "String",
+        "metadata": { "description": "Private endpoint sub-resource, e.g. vault, blob, account, searchService" }
+      },
+      "privateDnsZoneIds": {
+        "type": "Array",
+        "metadata": { "description": "Resource IDs of the central privatelink zones to register in" }
+      },
+      "effect": {
+        "type": "String",
+        "allowedValues": ["DeployIfNotExists", "AuditIfNotExists", "Disabled"],
+        "defaultValue": "DeployIfNotExists"
+      }
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "properties": {
+    "displayName": "AI Advisory: Storage, Key Vault and AI Search must disable public network access",
+    "description": "Client documents, secrets and search indexes are reached only through private endpoints (ADR 0003). Prefer the built-in per-service definitions where P&T already assigns them; this one shows how a single definition can cover several resource types.",
+    "mode": "Indexed",
+    "policyRule": {
+      "if": {
+        "anyOf": [
+          {
+            "allOf": [
+              { "field": "type", "equals": "Microsoft.Storage/storageAccounts" },
+              { "field": "Microsoft.Storage/storageAccounts/publicNetworkAccess", "notEquals": "Disabled" }
+            ]
+          },
+          {
+            "allOf": [
+              { "field": "type", "equals": "Microsoft.KeyVault/vaults" },
+              { "field": "Microsoft.KeyVault/vaults/publicNetworkAccess", "notEquals": "Disabled" }
+            ]
+          },
+          {
+            "allOf": [
+              { "field": "type", "equals": "Microsoft.Search/searchServices" },
+              { "field": "Microsoft.Search/searchServices/publicNetworkAccess", "notEquals": "Disabled" }
+            ]
+          }
+        ]
+      },
+      "then": { "effect": "[parameters('effect')]" }
+    },
+    "parameters": {
+      "effect": { "type": "String", "allowedValues": ["Audit", "Deny", "Disabled"], "defaultValue": "Deny" }
+    }
+  }
+}
