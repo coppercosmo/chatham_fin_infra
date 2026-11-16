@@ -14,10 +14,36 @@
 %{ endfor ~}
       </client-application-ids>
       <audiences>
-        <audience>https://cognitiveservices.azure.com</audience>
+%{ for a in audiences ~}
+        <audience>${a}</audience>
+%{ endfor ~}
       </audiences>
     </validate-azure-ad-token>
     <set-variable name="callerAppId" value="@(context.Request.Headers.GetValueOrDefault(&quot;Authorization&quot;,&quot;&quot;).AsJwt()?.Claims.GetValueOrDefault(&quot;appid&quot;, &quot;unknown&quot;))" />
+%{ if pooled ~}
+    <!-- 1b. Pooled tier (ADR 0014): the tenant comes ONLY from the validated token, never from a header or the
+         body. A per-tenant background identity maps to its tenant; a user carries a ${role_prefix}<code> app role. -->
+    <set-variable name="tenant" value="@{
+      var appid = (string)context.Variables[&quot;callerAppId&quot;];
+%{ for id, t in caller_tenants ~}
+      if (appid == &quot;${id}&quot;) { return &quot;${t}&quot;; }
+%{ endfor ~}
+      var jwt = context.Request.Headers.GetValueOrDefault(&quot;Authorization&quot;, &quot;&quot;).AsJwt();
+      if (jwt != null &amp;&amp; jwt.Claims.ContainsKey(&quot;roles&quot;)) {
+        foreach (var r in jwt.Claims[&quot;roles&quot;]) {
+          if (r.StartsWith(&quot;${role_prefix}&quot;)) { return r.Substring(${length(role_prefix)}); }
+        }
+      }
+      return &quot;&quot;;
+    }" />
+    <choose>
+      <when condition="@(string.IsNullOrEmpty((string)context.Variables[&quot;tenant&quot;]))">
+        <return-response>
+          <set-status code="403" reason="No tenant in token" />
+        </return-response>
+      </when>
+    </choose>
+%{ endif ~}
 %{ if content_safety ~}
     <!-- 2. Prompt Shields + harm categories before any tokens are spent (preview policy). -->
     <llm-content-safety backend-id="content-safety" shield-prompt="true">
@@ -29,12 +55,15 @@
       </categories>
     </llm-content-safety>
 %{ endif ~}
-    <!-- 3. Token rate limit (and optional monthly quota) per calling identity. -->
-    <llm-token-limit counter-key="@((string)context.Variables[&quot;callerAppId&quot;])" tokens-per-minute="${tpm}"%{ if quota > 0 } token-quota="${quota}" token-quota-period="Monthly"%{ endif } estimate-prompt-tokens="true" remaining-tokens-header-name="x-ratelimit-remaining-tokens" tokens-consumed-header-name="x-tokens-consumed" />
+    <!-- 3. Token rate limit (and optional monthly quota) per ${pooled ? "tenant" : "calling identity"}. -->
+    <llm-token-limit counter-key="@((string)context.Variables[&quot;${pooled ? "tenant" : "callerAppId"}&quot;])" tokens-per-minute="${tpm}"%{ if quota > 0 } token-quota="${quota}" token-quota-period="Monthly"%{ endif } estimate-prompt-tokens="true" remaining-tokens-header-name="x-ratelimit-remaining-tokens" tokens-consumed-header-name="x-tokens-consumed" />
     <!-- 4. Token usage metrics for chargeback/showback, tagged with client and caller. -->
     <llm-emit-token-metric namespace="ai-gateway">
       <dimension name="Client" value="${client}" />
       <dimension name="CallerAppId" value="@((string)context.Variables[&quot;callerAppId&quot;])" />
+%{ if pooled ~}
+      <dimension name="Tenant" value="@((string)context.Variables[&quot;tenant&quot;])" />
+%{ endif ~}
       <dimension name="API ID" />
       <dimension name="Operation ID" />
     </llm-emit-token-metric>

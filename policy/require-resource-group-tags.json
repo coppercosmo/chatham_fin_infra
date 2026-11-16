@@ -1,0 +1,30 @@
+{
+  "properties": {
+    "displayName": "AI Advisory: resource groups must carry the required tags",
+    "description": "Denies a resource group that is missing any of the listed tags. Resources then inherit the values from their resource group (see inherit-tag-from-resource-group), so cost and ownership reports per client work without every module having to remember every tag.",
+    "mode": "All",
+    "policyRule": {
+      "if": {
+        "allOf": [
+          { "field": "type", "equals": "Microsoft.Resources/subscriptions/resourceGroups" },
+          {
+            "count": {
+              "value": "[parameters('tagNames')]",
+              "name": "tagName",
+              "where": { "field": "[concat('tags[', current('tagName'), ']')]", "exists": "false" }
+            },
+            "greater": 0
+          }
+        ]
+      },
+      "then": { "effect": "[parameters('effect')]" }
+    },
+    "parameters": {
+      "tagNames": {
+        "type": "Array",
+        "defaultValue": ["client", "cost_center", "data_classification", "owner"]
+      },
+      "effect": { "type": "String", "allowedValues": ["Audit", "Deny", "Disabled"], "defaultValue": "Deny" }
+    }
+  }
+}

@@ -1,6 +1,6 @@
 # ADR 0001: One Azure subscription per client
 
-- Status: Accepted
+- Status: Accepted. Amended by [0014](0014-isolation-tiers.md) (proposed): two cheaper tiers for lower-sensitivity work; this stays the default for confidential client data
 - Date: 2026-11-13
 
 ## Context

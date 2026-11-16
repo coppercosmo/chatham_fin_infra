@@ -107,3 +107,22 @@ variable "app_insights_connection_string" {
   type      = string
   sensitive = true
 }
+
+variable "audiences" {
+  type        = list(string)
+  default     = ["https://cognitiveservices.azure.com"]
+  description = "Token audiences the gateway accepts. Pooled tier adds the pooled app's own API (the signed-in user's token)."
+}
+
+variable "tenancy" {
+  description = <<-EOT
+    null = one client per gateway (Tiers 1 and 2). Set for the pooled tier (ADR 0014): the tenant is read from the
+    validated token only (a user's app role "<role_prefix><code>", or a per-tenant background identity's client ID),
+    a request without a tenant gets 403, and token limits and metrics are per tenant.
+  EOT
+  type = object({
+    role_prefix    = optional(string, "Tenant.")
+    caller_tenants = optional(map(string), {}) # client ID of a per-tenant identity => tenant code
+  })
+  default = null
+}

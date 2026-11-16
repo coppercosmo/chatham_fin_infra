@@ -1,0 +1,32 @@
+{
+  "properties": {
+    "displayName": "AI Advisory: inherit a tag from the resource group if missing",
+    "description": "Modify effect: copies one tag from the resource group onto any resource created without it. Assign once per tag. Mirrors the built-in 'Inherit a tag from the resource group if missing'.",
+    "mode": "Indexed",
+    "policyRule": {
+      "if": {
+        "allOf": [
+          { "field": "[concat('tags[', parameters('tagName'), ']')]", "exists": "false" },
+          { "value": "[resourceGroup().tags[parameters('tagName')]]", "notEquals": "" }
+        ]
+      },
+      "then": {
+        "effect": "[parameters('effect')]",
+        "details": {
+          "roleDefinitionIds": ["/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"],
+          "operations": [
+            {
+              "operation": "add",
+              "field": "[concat('tags[', parameters('tagName'), ']')]",
+              "value": "[resourceGroup().tags[parameters('tagName')]]"
+            }
+          ]
+        }
+      }
+    },
+    "parameters": {
+      "tagName": { "type": "String" },
+      "effect": { "type": "String", "allowedValues": ["Modify", "Disabled"], "defaultValue": "Modify" }
+    }
+  }
+}

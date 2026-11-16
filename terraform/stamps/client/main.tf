@@ -20,6 +20,7 @@ locals {
 
   tags = merge(var.tags, {
     client              = var.client
+    isolation_tier      = "1-dedicated" # ADR 0014
     environment         = var.environment
     data_classification = var.data_classification
     cost_center         = var.cost_center

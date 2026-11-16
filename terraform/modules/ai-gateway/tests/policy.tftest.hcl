@@ -80,3 +80,53 @@ run "single_backend_no_retry_with_quota_and_content_safety" {
     error_message = "Content safety must run Prompt Shields when enabled."
   }
 }
+
+run "pooled_mode_takes_the_tenant_from_the_token_only" {
+  command = plan
+
+  variables {
+    audiences                 = ["api://ai-advisory-pooled", "https://cognitiveservices.azure.com"]
+    allowed_caller_client_ids = ["bbbbbbbb-0000-0000-0000-000000000001", "cccccccc-0000-0000-0000-00000000000c"]
+    tenancy = {
+      caller_tenants = { "cccccccc-0000-0000-0000-00000000000c" = "contoso" }
+    }
+  }
+
+  assert {
+    condition     = strcontains(output.policy_xml, "<audience>api://ai-advisory-pooled</audience>")
+    error_message = "Pooled gateway must accept the signed-in user's token for the pooled app's API."
+  }
+  assert {
+    condition     = strcontains(output.policy_xml, "StartsWith(&quot;Tenant.&quot;)") && strcontains(output.policy_xml, "Substring(7)")
+    error_message = "The tenant must come from the Tenant.<code> app role in the validated token."
+  }
+  assert {
+    condition     = strcontains(output.policy_xml, "if (appid == &quot;cccccccc-0000-0000-0000-00000000000c&quot;) { return &quot;contoso&quot;; }")
+    error_message = "A per-tenant background identity maps to its own tenant."
+  }
+  assert {
+    condition     = strcontains(output.policy_xml, "set-status code=\"403\" reason=\"No tenant in token\"")
+    error_message = "A request without a tenant claim must be refused."
+  }
+  assert {
+    condition     = strcontains(output.policy_xml, "counter-key=\"@((string)context.Variables[&quot;tenant&quot;])\"")
+    error_message = "Token limits are per tenant in the pooled tier."
+  }
+  assert {
+    condition     = strcontains(output.policy_xml, "<dimension name=\"Tenant\"")
+    error_message = "Token metrics carry the tenant for showback."
+  }
+  assert {
+    condition     = !strcontains(lower(output.policy_xml), "x-tenant")
+    error_message = "The tenant must never be read from a request header."
+  }
+}
+
+run "single_client_mode_has_no_tenant_logic" {
+  command = plan
+
+  assert {
+    condition     = !strcontains(output.policy_xml, "name=\"tenant\"") && strcontains(output.policy_xml, "counter-key=\"@((string)context.Variables[&quot;callerAppId&quot;])\"")
+    error_message = "Tiers 1 and 2 keep per-caller limits and no tenant resolution."
+  }
+}

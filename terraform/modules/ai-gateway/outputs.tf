@@ -11,3 +11,8 @@ output "policy_xml" {
   description = "Rendered policy, exposed for tests and review."
   value       = local.policy_xml
 }
+output "pooled" {
+  description = "true when the tenant is resolved from the token (pooled tier, ADR 0014)."
+  value       = var.tenancy != null
+}
+output "audiences" { value = var.audiences }
