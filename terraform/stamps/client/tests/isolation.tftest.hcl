@@ -215,3 +215,198 @@ run "without_gateway_app_calls_model_directly" {
     error_message = "Without the gateway the app keeps its direct, least-privilege model role."
   }
 }
+
+# ---------------------------------------------------------------- client network connectivity (ADR 0013)
+
+run "no_client_connectivity_changes_nothing" {
+  command = plan
+
+  variables {
+    ingress = {
+      host_name             = "testco.ai.example.com"
+      certificate_secret_id = "https://kv-testco.vault.azure.net/secrets/testco-tls"
+    }
+  }
+
+  assert {
+    condition     = output.hub_connectivity_request == null && output.private_link_offer == null
+    error_message = "With client_connectivity = none there is nothing to hand to P&T or to the client."
+  }
+  assert {
+    condition     = join(",", output.ingress_allowed_sources) == "VirtualNetwork" && !module.network.uses_remote_gateways
+    error_message = "Default ingress sources and peering must be unchanged when no client network is connected."
+  }
+}
+
+run "expressroute_client_is_admitted_only_from_its_own_ranges" {
+  command = plan
+
+  variables {
+    connectivity_mode = "landing_zone"
+    hub = {
+      vnet_id             = "/subscriptions/33333333-3333-3333-3333-333333333333/resourceGroups/rg-hub/providers/Microsoft.Network/virtualNetworks/vnet-hub"
+      firewall_private_ip = "10.0.0.4"
+      dns_servers         = ["10.0.1.4"]
+      gateway_transit     = true
+    }
+    ingress = {
+      host_name             = "testco.ai.example.com"
+      certificate_secret_id = "https://kv-testco.vault.azure.net/secrets/testco-tls"
+    }
+    client_connectivity = {
+      type             = "expressroute"
+      on_prem_prefixes = ["172.16.0.0/16", "192.168.10.0/24"]
+      expressroute = {
+        circuit_id = "/subscriptions/99999999-9999-9999-9999-999999999999/resourceGroups/rg-er/providers/Microsoft.Network/expressRouteCircuits/er-testco"
+      }
+    }
+  }
+
+  assert {
+    condition     = join(",", output.ingress_allowed_sources) == "172.16.0.0/16,192.168.10.0/24"
+    error_message = "The App Gateway NSG must admit only this client's network, never the VirtualNetwork tag (it matches every client the hub gateway knows)."
+  }
+  assert {
+    condition     = join(",", module.network.agw_routes_via_firewall) == "172.16.0.0/16,192.168.10.0/24"
+    error_message = "Replies to the client's network must go back through the hub firewall (symmetric routing)."
+  }
+  assert {
+    condition     = module.network.uses_remote_gateways
+    error_message = "With gateway transit agreed, the spoke must use the hub gateway."
+  }
+  assert {
+    condition     = output.hub_connectivity_request.ingress_ip == "10.100.2.10" && output.hub_connectivity_request.spoke_prefix == "10.100.0.0/22"
+    error_message = "The request to P&T must carry the spoke range and the App Gateway private IP."
+  }
+  assert {
+    condition     = output.private_link_offer == null && !module.ingress[0].private_link_enabled
+    error_message = "A routed client must not also get Private Link."
+  }
+}
+
+run "vpn_client_with_nat_waits_for_gateway_transit" {
+  command = plan
+
+  variables {
+    connectivity_mode = "landing_zone"
+    hub = {
+      vnet_id             = "/subscriptions/33333333-3333-3333-3333-333333333333/resourceGroups/rg-hub/providers/Microsoft.Network/virtualNetworks/vnet-hub"
+      firewall_private_ip = "10.0.0.4"
+      dns_servers         = ["10.0.1.4"]
+    }
+    ingress = {
+      host_name             = "testco.ai.example.com"
+      certificate_secret_id = "https://kv-testco.vault.azure.net/secrets/testco-tls"
+    }
+    client_connectivity = {
+      type             = "vpn"
+      on_prem_prefixes = ["100.64.12.0/24"]
+      vpn = {
+        device_public_ip = "203.0.113.10"
+        nat              = [{ client_prefix = "10.0.0.0/24", azure_prefix = "100.64.12.0/24" }]
+      }
+    }
+  }
+
+  # The check block warns that the client can't reach the spoke yet; that warning is the point.
+  expect_failures = [check.gateway_transit_for_routed_clients]
+
+  assert {
+    condition     = !module.network.uses_remote_gateways
+    error_message = "Gateway transit stays off until P&T has applied their side (hub.gateway_transit)."
+  }
+  assert {
+    condition     = output.hub_connectivity_request.vpn.nat[0].azure_prefix == "100.64.12.0/24"
+    error_message = "NAT mappings must be passed to P&T in the request."
+  }
+  assert {
+    condition     = module.ingress[0].waf_mode == "Prevention" && join(",", output.ingress_allowed_sources) == "100.64.12.0/24"
+    error_message = "Azure-side controls must use the translated (post-NAT) range."
+  }
+}
+
+run "private_link_client_needs_no_hub" {
+  command = plan
+
+  variables {
+    connectivity_mode = "standalone"
+    ingress = {
+      host_name             = "testco.ai.example.com"
+      certificate_secret_id = "https://kv-testco.vault.azure.net/secrets/testco-tls"
+    }
+    client_connectivity = {
+      type         = "privatelink"
+      private_link = { consumer_subscription_ids = ["88888888-8888-8888-8888-888888888888"] }
+    }
+  }
+
+  assert {
+    condition     = module.ingress[0].private_link_enabled && module.ingress[0].listener_frontend == "private"
+    error_message = "Private Link must attach to the private frontend; nothing listens on the public IP."
+  }
+  assert {
+    condition     = join(",", output.ingress_allowed_sources) == "10.100.1.128/27"
+    error_message = "With Private Link, the App Gateway NSG admits only the Private Link subnet."
+  }
+  assert {
+    condition     = output.private_link_offer.target_sub_resource == "private" && output.hub_connectivity_request == null
+    error_message = "The client needs the gateway ID and the 'private' sub-resource; P&T's hub needs nothing."
+  }
+}
+
+run "routed_client_requires_landing_zone" {
+  command = plan
+
+  variables {
+    connectivity_mode = "standalone"
+    ingress = {
+      host_name             = "testco.ai.example.com"
+      certificate_secret_id = "https://kv-testco.vault.azure.net/secrets/testco-tls"
+    }
+    client_connectivity = {
+      type             = "vpn"
+      on_prem_prefixes = ["172.16.0.0/16"]
+      vpn              = { device_public_ip = "203.0.113.10" }
+    }
+  }
+
+  expect_failures = [terraform_data.client_connectivity_contract]
+}
+
+run "client_network_overlapping_the_spoke_is_refused" {
+  command = plan
+
+  variables {
+    connectivity_mode = "landing_zone"
+    hub = {
+      vnet_id             = "/subscriptions/33333333-3333-3333-3333-333333333333/resourceGroups/rg-hub/providers/Microsoft.Network/virtualNetworks/vnet-hub"
+      firewall_private_ip = "10.0.0.4"
+      dns_servers         = ["10.0.1.4"]
+      gateway_transit     = true
+    }
+    ingress = {
+      host_name             = "testco.ai.example.com"
+      certificate_secret_id = "https://kv-testco.vault.azure.net/secrets/testco-tls"
+    }
+    client_connectivity = {
+      type             = "expressroute"
+      on_prem_prefixes = ["10.0.0.0/8"] # contains the spoke 10.100.0.0/22
+      expressroute     = { circuit_id = "/subscriptions/99999999-9999-9999-9999-999999999999/resourceGroups/rg-er/providers/Microsoft.Network/expressRouteCircuits/er-testco" }
+    }
+  }
+
+  expect_failures = [terraform_data.client_connectivity_contract]
+}
+
+run "connectivity_type_block_must_match" {
+  command = plan
+
+  variables {
+    client_connectivity = {
+      type             = "vpn"
+      on_prem_prefixes = ["172.16.0.0/16"]
+    }
+  }
+
+  expect_failures = [var.client_connectivity]
+}

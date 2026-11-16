@@ -196,3 +196,19 @@ With the gateway on, the app has no role on the model accounts, so every call go
 | AKS cluster (when used) | **No** | Dedicated cluster per client (ADR 0011) |
 | AI gateway (APIM) | **No** by default | Per client in the stamp; a shared APIM only for internal apps or with per-client workspace gateways (ADR 0012) |
 | Deployment identity, GitHub Environment | **No** | Pipeline blast radius (ADR 0008) |
+| Hub ExpressRoute / VPN gateways, firewall, DNS resolver | **Yes**, P&T-owned | Shared plumbing, but one connection, route, firewall rule and DNS zone per client, no BGP between clients, overlap refused in CI. Private Link clients don't touch it (ADR 0013) |
+
+## 8. Client network connectivity (ADR 0013)
+
+```mermaid
+flowchart LR
+  WG[Client on Azure<br/>private endpoint in THEIR sub] -. Private Link .-> AGW1[Client App Gateway]
+  ER[Client datacenter] == ExpressRoute ==> GW[Hub gateways]
+  VPN[Client firewall] == IPsec, BGP off, NAT ==> GW
+  GW --> FW{{Hub firewall<br/>client ranges -> own AGW:443}} --> AGW2[Client App Gateway<br/>NSG + WAF: client ranges only]
+```
+
+`client_connectivity` per client: `privatelink` (preferred), `expressroute`, `vpn` or `none`. The
+stamp emits `hub_connectivity_request` for P&T's `hub-connectivity` module. Full design, isolation
+controls, onboarding order and a plain-words networking glossary:
+[client-connectivity.md](client-connectivity.md).

@@ -17,6 +17,12 @@ review."
 Also added along the way: a platform Log Analytics workspace that records who read or wrote
 Terraform state and who pushed or pulled images.
 
+**Client connectivity (ADR 0013) added three skips, each with its reason in the code:** the App
+Gateway Private Link subnet and the DNS resolver's inbound subnet have no NSG (they hold only
+Azure-managed addresses; access is enforced on `snet-agw`'s NSG, by endpoint approval, and by
+routing and the firewall), and the reference hub's firewall has threat intelligence set to Deny on
+its policy rather than on the firewall resource, which is how a policy-managed firewall is configured.
+
 ## Why it matters (for a non-technical audience)
 "A scanner gives you a to-do list, not a verdict. In financial services the auditor's question is
 'show me you knew about it and decided'. Every exception is written next to the code it affects,

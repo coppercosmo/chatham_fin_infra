@@ -17,3 +17,4 @@ consequences, alternatives. A decision can be superseded by a later ADR; it is n
 | [0010](0010-private-ingress-app-gateway-waf.md) | Private ingress through a per-client Application Gateway WAF_v2 | Accepted |
 | [0011](0011-aks-hosting-option.md) | AKS as a per-client hosting option (dedicated private cluster) | Accepted, amends 0005 |
 | [0012](0012-ai-gateway-api-management.md) | AI gateway (API Management) between client apps and models | Accepted, piloting |
+| [0013](0013-client-network-connectivity.md) | Client network connectivity: Private Link first, then ExpressRoute or VPN through the hub | Accepted, amends 0010 |

@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="3300" height="2318" viewBox="0 0 3300 2318">
+<svg xmlns="http://www.w3.org/2000/svg" width="3300" height="2348" viewBox="0 0 3300 2348">
 <defs>
 <marker id="ah-1f8a68" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f8a68"/></marker>
 <marker id="ah-3b74c4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#3b74c4"/></marker>
@@ -71,75 +71,104 @@
 <rect x="30" y="380" width="360" height="1468" rx="12" fill="#f3f1f8" stroke="#6b5ca5" stroke-width="2" opacity="1"/>
 <text x="44" y="406" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#6b5ca5">Users and edge</text>
 <rect x="45" y="440" width="330" height="80" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
-<text x="53" y="461" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" text-anchor="start" fill="#1b2430">acme analysts (insurance)</text>
-<text x="53" y="480" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">Corporate network -&gt; ExpressRoute / VPN</text>
-<text x="53" y="495" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">-&gt; Chatham hub (private only)</text>
-<text x="53" y="510" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">acme.ai.&lt;domain&gt;</text>
-<rect x="45" y="535" width="330" height="80" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
-<text x="53" y="556" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" text-anchor="start" fill="#1b2430">meridian analysts (asset manager)</text>
-<text x="53" y="575" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">Internet, from 198.51.100.0/24 only</text>
-<text x="53" y="590" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">NSG + WAF IP allow-list</text>
-<text x="53" y="605" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">meridian.ai.&lt;domain&gt;</text>
-<rect x="45" y="630" width="330" height="62" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
-<text x="53" y="651" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" text-anchor="start" fill="#1b2430">Chatham engagement team</text>
-<text x="53" y="670" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">Corp network, Entra ID SSO + PIM</text>
-<rect x="45" y="710" width="330" height="96" rx="6" fill="#eaf2fd" stroke="#3b74c4" stroke-width="1.2" opacity="1"/>
-<text x="53" y="731" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" text-anchor="start" fill="#1b2430">Azure Front Door Premium (optional)</text>
-<text x="53" y="750" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">Global edge for internet, multi-region</text>
-<text x="53" y="765" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">clients; WAF at edge; reaches the</text>
-<text x="53" y="780" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">client App Gateway via Private Link</text>
-<rect x="45" y="825" width="330" height="80" rx="6" fill="#eaf2fd" stroke="#3b74c4" stroke-width="1.2" opacity="1"/>
-<text x="53" y="846" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" text-anchor="start" fill="#1b2430">DNS (P&amp;T)</text>
-<text x="53" y="865" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">&lt;client&gt;.ai.&lt;domain&gt; -&gt; App Gateway</text>
-<text x="53" y="880" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">private IP (x.x.2.10) in client spoke</text>
-<text x="45" y="940" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" text-anchor="start" fill="#1b2430">Identity for end users</text>
-<text x="45" y="962" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">Client staff sign in to the app with Entra ID</text>
-<text x="45" y="978" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">(B2B guests or the client&#x27;s own tenant via</text>
-<text x="45" y="994" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">app registration); app enforces roles.</text>
-<text x="45" y="1010" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">No user ever reaches a model, vault or</text>
-<text x="45" y="1026" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">storage account directly.</text>
-<text x="45" y="1070" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" text-anchor="start" fill="#1b2430">Operators</text>
-<text x="45" y="1092" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">Readers: standing Reader + AKS RBAC Reader.</text>
-<text x="45" y="1108" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">Writers: PIM-elevated Contributor, time-</text>
-<text x="45" y="1124" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">bound, approved. Bastion (hub) for private</text>
-<text x="45" y="1140" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">AKS API / troubleshooting.</text>
+<text x="53" y="461" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" text-anchor="start" fill="#1b2430">acme analysts (insurance): ExpressRoute</text>
+<text x="53" y="480" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">acme&#x27;s own circuit -&gt; hub ExpressRoute gateway</text>
+<text x="53" y="495" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">-&gt; firewall: acme ranges to acme AGW:443 only</text>
+<text x="53" y="510" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">acme.ai.&lt;domain&gt;, private only (ADR 0013)</text>
+<rect x="45" y="534" width="330" height="80" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
+<text x="53" y="555" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" text-anchor="start" fill="#1b2430">fabrikam analysts (bank): site-to-site VPN</text>
+<text x="53" y="574" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">IPsec IKEv2 to hub VPN gateway, BGP off</text>
+<text x="53" y="589" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">home 172.16.40.0/24 NAT&#x27;d to 100.64.12.0/24</text>
+<text x="53" y="604" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">(same stamp as acme; column not drawn)</text>
+<rect x="45" y="628" width="330" height="97" rx="6" fill="#ffffff" stroke="#c0392b" stroke-width="2" opacity="1"/>
+<text x="53" y="649" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" text-anchor="start" fill="#1b2430">woodgrove analysts (bank on Azure): Private</text>
+<text x="53" y="666" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" text-anchor="start" fill="#1b2430">Link</text>
+<text x="53" y="685" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">Private endpoint in woodgrove&#x27;s OWN subscription</text>
+<text x="53" y="700" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">-&gt; App Gateway Private Link. No hub routing,</text>
+<text x="53" y="715" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">IP overlap irrelevant (column not drawn)</text>
+<rect x="45" y="739" width="330" height="80" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
+<text x="53" y="760" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" text-anchor="start" fill="#1b2430">meridian analysts (asset manager)</text>
+<text x="53" y="779" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">Internet, from 198.51.100.0/24 only</text>
+<text x="53" y="794" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">NSG + WAF IP allow-list</text>
+<text x="53" y="809" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">meridian.ai.&lt;domain&gt;</text>
+<rect x="45" y="833" width="330" height="50" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
+<text x="53" y="854" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" text-anchor="start" fill="#1b2430">Chatham engagement team</text>
+<text x="53" y="873" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">Corp network, Entra ID SSO + PIM</text>
+<rect x="45" y="897" width="330" height="80" rx="6" fill="#eaf2fd" stroke="#3b74c4" stroke-width="1.2" opacity="1"/>
+<text x="53" y="918" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" text-anchor="start" fill="#1b2430">Azure Front Door Premium (optional)</text>
+<text x="53" y="937" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">Global edge for internet, multi-region</text>
+<text x="53" y="952" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">clients; WAF at edge; reaches the</text>
+<text x="53" y="967" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">client App Gateway via Private Link</text>
+<rect x="45" y="991" width="330" height="95" rx="6" fill="#eaf2fd" stroke="#3b74c4" stroke-width="1.2" opacity="1"/>
+<text x="53" y="1012" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" text-anchor="start" fill="#1b2430">DNS (P&amp;T)</text>
+<text x="53" y="1031" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">&lt;client&gt;.ai.&lt;domain&gt; -&gt; App Gateway</text>
+<text x="53" y="1046" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">private IP (x.x.2.10) in client spoke.</text>
+<text x="53" y="1061" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">Client DNS forwards only its own zone</text>
+<text x="53" y="1076" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">to the resolver inbound IP 10.0.1.4</text>
+<circle cx="366" cy="642" r="12" fill="#6b5ca5"/>
+<text x="366" y="646.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="middle" fill="#ffffff">5</text>
+<text x="45" y="1130" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" text-anchor="start" fill="#1b2430">Identity for end users</text>
+<text x="45" y="1152" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">Client staff sign in to the app with Entra ID</text>
+<text x="45" y="1168" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">(B2B guests or the client&#x27;s own tenant via</text>
+<text x="45" y="1184" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">app registration); app enforces roles.</text>
+<text x="45" y="1200" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">No user ever reaches a model, vault or</text>
+<text x="45" y="1216" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">storage account directly.</text>
+<text x="45" y="1260" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" text-anchor="start" fill="#1b2430">Operators</text>
+<text x="45" y="1282" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">Readers: standing Reader + AKS RBAC Reader.</text>
+<text x="45" y="1298" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">Writers: PIM-elevated Contributor, time-</text>
+<text x="45" y="1314" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">bound, approved. Bastion (hub) for private</text>
+<text x="45" y="1330" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">AKS API / troubleshooting.</text>
 <rect x="410" y="380" width="390" height="1468" rx="12" fill="#eaf2fd" stroke="#3b74c4" stroke-width="2" opacity="1"/>
 <text x="424" y="406" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#3b74c4">Connectivity subscription: hub VNet</text>
 <text x="424" y="425" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">Owned by P&amp;T (ADR 0002, 0003)</text>
-<rect x="425" y="450" width="360" height="50" rx="6" fill="#ffffff" stroke="#3b74c4" stroke-width="1.2" opacity="1"/>
-<text x="433" y="471" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" text-anchor="start" fill="#1b2430">ExpressRoute / VPN gateway</text>
-<text x="433" y="490" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">Client + Chatham private connectivity</text>
-<rect x="425" y="514" width="360" height="80" rx="6" fill="#ffffff" stroke="#c0392b" stroke-width="2" opacity="1"/>
-<text x="433" y="535" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" text-anchor="start" fill="#1b2430">Azure Firewall (Premium)</text>
-<text x="433" y="554" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">0.0.0.0/0 from every spoke (UDR)</text>
-<text x="433" y="569" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">FQDN allow-list egress, IDPS</text>
-<text x="433" y="584" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">spoke-to-spoke DENIED</text>
-<rect x="425" y="608" width="360" height="65" rx="6" fill="#ffffff" stroke="#3b74c4" stroke-width="1.2" opacity="1"/>
-<text x="433" y="629" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" text-anchor="start" fill="#1b2430">Private DNS Resolver</text>
-<text x="433" y="648" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">Spokes use it as DNS server</text>
-<text x="433" y="663" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">Forwards to privatelink zones</text>
-<rect x="425" y="687" width="360" height="80" rx="6" fill="#ffffff" stroke="#3b74c4" stroke-width="1.2" opacity="1"/>
-<text x="433" y="708" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" text-anchor="start" fill="#1b2430">privatelink.* Private DNS zones</text>
-<text x="433" y="727" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">vaultcore, openai, blob, search,</text>
-<text x="433" y="742" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">cognitiveservices, azmk8s.io</text>
-<text x="433" y="757" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">Records created by DINE policy</text>
-<rect x="425" y="781" width="360" height="65" rx="6" fill="#ffffff" stroke="#3b74c4" stroke-width="1.2" opacity="1"/>
-<text x="433" y="802" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" text-anchor="start" fill="#1b2430">Linked per-client zones</text>
-<text x="433" y="821" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">&lt;apim&gt;.azure-api.net, ACA env zone</text>
-<text x="433" y="836" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">(linked to resolver VNet by P&amp;T)</text>
-<rect x="425" y="860" width="360" height="65" rx="6" fill="#ffffff" stroke="#3b74c4" stroke-width="1.2" opacity="1"/>
-<text x="433" y="881" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" text-anchor="start" fill="#1b2430">Azure Bastion</text>
-<text x="433" y="900" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">Jump path to private AKS API</text>
-<text x="433" y="915" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">and troubleshooting VMs</text>
-<rect x="425" y="939" width="360" height="50" rx="6" fill="#ffffff" stroke="#3b74c4" stroke-width="1.2" opacity="1"/>
-<text x="433" y="960" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" text-anchor="start" fill="#1b2430">DDoS Network Protection plan</text>
-<text x="433" y="979" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">Applied to public IPs by policy</text>
-<text x="425" y="1017" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" text-anchor="start" fill="#1b2430">Hub &lt;-&gt; spoke VNet peering</text>
-<text x="425" y="1039" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">Spoke side created by the stamp; hub side</text>
-<text x="425" y="1055" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">by P&amp;T. Spokes never peer with each other.</text>
-<text x="425" y="1071" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">Standalone mode (chatham sandbox): no</text>
-<text x="425" y="1087" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">peering, stamp creates its own privatelink</text>
-<text x="425" y="1103" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">zones, Azure-provided DNS.</text>
+<rect x="425" y="450" width="360" height="80" rx="6" fill="#ffffff" stroke="#3b74c4" stroke-width="1.2" opacity="1"/>
+<text x="433" y="471" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" text-anchor="start" fill="#1b2430">ExpressRoute gateway (ErGw1AZ)</text>
+<text x="433" y="490" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">Client circuits linked by authorization key</text>
+<text x="433" y="505" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">VNet-to-VNet over circuits OFF;</text>
+<text x="433" y="520" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">no circuit-to-circuit transit</text>
+<rect x="425" y="544" width="360" height="80" rx="6" fill="#ffffff" stroke="#3b74c4" stroke-width="1.2" opacity="1"/>
+<text x="433" y="565" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" text-anchor="start" fill="#1b2430">VPN gateway (VpnGw2AZ, active-active)</text>
+<text x="433" y="584" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">IPsec IKEv2 per client, BGP OFF so no</text>
+<text x="433" y="599" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">client learns another&#x27;s routes;</text>
+<text x="433" y="614" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">static NAT for overlapping ranges</text>
+<rect x="425" y="638" width="360" height="125" rx="6" fill="#ffffff" stroke="#c0392b" stroke-width="2" opacity="1"/>
+<text x="433" y="659" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" text-anchor="start" fill="#1b2430">Azure Firewall (Premium)</text>
+<text x="433" y="678" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">0.0.0.0/0 from every spoke (UDR)</text>
+<text x="433" y="693" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">GatewaySubnet: each spoke -&gt; firewall</text>
+<text x="433" y="708" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">One rule per client: its ranges -&gt;</text>
+<text x="433" y="723" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">its own AGW IP:443. Default deny.</text>
+<text x="433" y="738" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">FQDN allow-list egress, IDPS</text>
+<text x="433" y="753" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">spoke-to-spoke DENIED</text>
+<rect x="425" y="777" width="360" height="80" rx="6" fill="#ffffff" stroke="#3b74c4" stroke-width="1.2" opacity="1"/>
+<text x="433" y="798" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" text-anchor="start" fill="#1b2430">Private DNS Resolver</text>
+<text x="433" y="817" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">Spokes use it as DNS server</text>
+<text x="433" y="832" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">Inbound endpoint 10.0.1.4 for client</text>
+<text x="433" y="847" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">DNS conditional forwarders</text>
+<rect x="425" y="871" width="360" height="80" rx="6" fill="#ffffff" stroke="#3b74c4" stroke-width="1.2" opacity="1"/>
+<text x="433" y="892" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" text-anchor="start" fill="#1b2430">privatelink.* Private DNS zones</text>
+<text x="433" y="911" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">vaultcore, openai, blob, search,</text>
+<text x="433" y="926" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">cognitiveservices, azmk8s.io</text>
+<text x="433" y="941" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">Records created by DINE policy</text>
+<rect x="425" y="965" width="360" height="80" rx="6" fill="#ffffff" stroke="#3b74c4" stroke-width="1.2" opacity="1"/>
+<text x="433" y="986" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" text-anchor="start" fill="#1b2430">Linked per-client zones</text>
+<text x="433" y="1005" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">&lt;client&gt;.ai.&lt;domain&gt; -&gt; AGW IP (routed</text>
+<text x="433" y="1020" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">clients), &lt;apim&gt;.azure-api.net, ACA env</text>
+<text x="433" y="1035" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">zone (linked to resolver VNet by P&amp;T)</text>
+<rect x="425" y="1059" width="360" height="65" rx="6" fill="#ffffff" stroke="#3b74c4" stroke-width="1.2" opacity="1"/>
+<text x="433" y="1080" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" text-anchor="start" fill="#1b2430">Azure Bastion</text>
+<text x="433" y="1099" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">Jump path to private AKS API</text>
+<text x="433" y="1114" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">and troubleshooting VMs</text>
+<rect x="425" y="1138" width="360" height="50" rx="6" fill="#ffffff" stroke="#3b74c4" stroke-width="1.2" opacity="1"/>
+<text x="433" y="1159" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" text-anchor="start" fill="#1b2430">DDoS Network Protection plan</text>
+<text x="433" y="1178" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">Applied to public IPs by policy</text>
+<text x="425" y="1216" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" text-anchor="start" fill="#1b2430">Hub &lt;-&gt; spoke VNet peering</text>
+<text x="425" y="1238" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">Spoke side created by the stamp; hub side</text>
+<text x="425" y="1254" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">by P&amp;T (modules/hub-connectivity). Gateway</text>
+<text x="425" y="1270" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">transit only for ExpressRoute/VPN clients.</text>
+<text x="425" y="1286" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">Spokes never peer with each other.</text>
+<text x="425" y="1302" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">Standalone mode (chatham sandbox): no</text>
+<text x="425" y="1318" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">peering, stamp creates its own privatelink</text>
+<text x="425" y="1334" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">zones, Azure-provided DNS.</text>
 <rect x="820" y="380" width="600" height="1468" rx="12" fill="#fbf3e6" stroke="#b7791f" stroke-width="2" opacity="1"/>
 <text x="834" y="406" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#b7791f">Client subscription: chatham (internal canary)</text>
 <text x="834" y="425" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">Ring 0  |  standalone  |  compute: Container Apps  |  ingress: none (internal only)</text>
@@ -246,142 +275,143 @@
 <rect x="1440" y="380" width="600" height="1468" rx="12" fill="#fbf3e6" stroke="#b7791f" stroke-width="2" opacity="1"/>
 <text x="1454" y="406" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#b7791f">Client subscription: acme (insurance)</text>
 <text x="1454" y="425" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">Ring 1  |  landing zone  |  compute: Container Apps  |  ingress: private</text>
-<rect x="1454" y="440" width="572" height="724" rx="10" fill="#fffaf2" stroke="#c9954a" stroke-width="1.8" opacity="1"/>
+<rect x="1454" y="440" width="572" height="738" rx="10" fill="#fffaf2" stroke="#c9954a" stroke-width="1.8" opacity="1"/>
 <text x="1466" y="462" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" text-anchor="start" fill="#b7791f">Spoke VNet  vnet-acme-prd-eus2  10.100.4.0/22</text>
 <text x="2014" y="462" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="600" text-anchor="end" fill="#c0392b">UDR 0.0.0.0/0 -&gt; hub firewall</text>
-<rect x="1466" y="476" width="548" height="172" rx="8" fill="#ffffff" stroke="#d9b98a" stroke-width="1.5" stroke-dasharray="5 3" opacity="1"/>
-<text x="1476" y="494" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="600" text-anchor="start" fill="#5b6675">snet-agw  10.100.6.0/24   NSG: GatewayManager, AzureLB, 443 from approved sources</text>
-<rect x="1476" y="504" width="259" height="134" rx="6" fill="#ffffff" stroke="#c0392b" stroke-width="2" opacity="1"/>
+<rect x="1466" y="476" width="548" height="186" rx="8" fill="#ffffff" stroke="#d9b98a" stroke-width="1.5" stroke-dasharray="5 3" opacity="1"/>
+<text x="1476" y="494" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="600" text-anchor="start" fill="#5b6675">snet-agw  10.100.6.0/24   NSG: GatewayManager, AzureLB, 443 from 172.16.0.0/16 only</text>
+<rect x="1476" y="504" width="259" height="148" rx="6" fill="#ffffff" stroke="#c0392b" stroke-width="2" opacity="1"/>
 <text x="1484" y="524" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">App Gateway WAF_v2</text>
 <text x="1484" y="540" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">(modules/app-gateway)</text>
 <text x="1484" y="558" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Private frontend 10.100.6.10, no public IP</text>
-<text x="1484" y="572" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Listener cert from client Key Vault via id-agw</text>
-<text x="1484" y="586" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">(versionless)</text>
-<text x="1484" y="600" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">TLS 1.2+ policy, SNI, HTTPS re-encrypt to</text>
-<text x="1484" y="614" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">backend</text>
-<text x="1484" y="628" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Streaming on, 180s timeout, autoscale 1-5</text>
-<rect x="1745" y="504" width="259" height="134" rx="6" fill="#ffffff" stroke="#c0392b" stroke-width="2" opacity="1"/>
+<text x="1484" y="572" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Return route 172.16.0.0/16 -&gt; hub firewall</text>
+<text x="1484" y="586" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Listener cert from client Key Vault via id-agw</text>
+<text x="1484" y="600" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">(versionless)</text>
+<text x="1484" y="614" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">TLS 1.2+ policy, SNI, HTTPS re-encrypt to</text>
+<text x="1484" y="628" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">backend</text>
+<text x="1484" y="642" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Streaming on, 180s timeout, autoscale 1-5</text>
+<rect x="1745" y="504" width="259" height="148" rx="6" fill="#ffffff" stroke="#c0392b" stroke-width="2" opacity="1"/>
 <text x="1753" y="524" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">WAF policy (per client)</text>
 <text x="1753" y="542" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Prevention mode; DRS 2.1 + Bot Manager 1.1</text>
 <text x="1753" y="556" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Prompt fields excluded from SQLI/XSS only</text>
 <text x="1753" y="570" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Rate limit per client IP</text>
 <text x="1753" y="584" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Access + firewall logs -&gt; client LAW</text>
-<rect x="1466" y="658" width="548" height="232" rx="8" fill="#ffffff" stroke="#d9b98a" stroke-width="1.5" stroke-dasharray="5 3" opacity="1"/>
-<text x="1476" y="676" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="600" text-anchor="start" fill="#5b6675">snet-apps  10.100.4.0/24   delegated to Microsoft.App/environments</text>
-<rect x="1476" y="686" width="528" height="62" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
-<text x="1484" y="706" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">Container Apps environment (internal LB, workload profiles)</text>
-<text x="1484" y="724" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">modules/container-apps; zone redundant; static internal IP; private DNS zone for the env domain; logs</text>
-<text x="1484" y="738" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">to the client Log Analytics workspace</text>
-<rect x="1476" y="758" width="259" height="76" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
-<text x="1484" y="778" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">ca-&lt;client&gt;-api</text>
-<text x="1484" y="796" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">User-assigned id-&lt;client&gt;-app</text>
-<text x="1484" y="810" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Image by digest from shared ACR</text>
-<text x="1484" y="824" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">AZURE_OPENAI_ENDPOINT = AI gateway URL</text>
-<rect x="1745" y="758" width="259" height="76" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
-<text x="1753" y="778" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">Container Apps Jobs</text>
-<text x="1753" y="796" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Ingestion / indexing</text>
-<text x="1753" y="810" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Evaluation runs</text>
-<text x="1753" y="824" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Same identity, same limits</text>
-<text x="1476" y="852" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">App calls models only through the AI gateway (no direct model role).</text>
-<text x="1476" y="868" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">Key Vault, Storage and Search via private endpoints, resource-scoped roles.</text>
-<rect x="1466" y="900" width="548" height="156" rx="8" fill="#ffffff" stroke="#d9b98a" stroke-width="1.5" stroke-dasharray="5 3" opacity="1"/>
-<text x="1476" y="918" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="600" text-anchor="start" fill="#5b6675">snet-apim  10.100.5.64/26   NSG: ApiManagement:3443, AzureLB:6390, 443 from workload</text>
-<rect x="1476" y="928" width="528" height="118" rx="6" fill="#ffffff" stroke="#c0392b" stroke-width="2" opacity="1"/>
-<text x="1484" y="948" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">AI gateway: API Management, internal VNet (modules/ai-gateway)</text>
-<text x="1484" y="966" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Premium_1 (zones), 40k TPM, Prompt Shields</text>
-<text x="1484" y="980" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">validate-azure-ad-token (only id-&lt;client&gt;-app, no keys) -&gt; llm-content-safety (Prompt Shields) -&gt;</text>
-<text x="1484" y="994" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">llm-token-limit per caller</text>
-<text x="1484" y="1008" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">llm-emit-token-metric (Client, CallerAppId) -&gt; managed identity to models -&gt; backend aoai-primary</text>
-<text x="1484" y="1022" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Circuit breaker per backend (429/5xx, honours Retry-After); prompt bodies not logged by default</text>
-<text x="1484" y="1036" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Private DNS zone &lt;apim&gt;.azure-api.net; gateway + token logs -&gt; client LAW / App Insights</text>
-<rect x="1466" y="1066" width="548" height="86" rx="8" fill="#ffffff" stroke="#d9b98a" stroke-width="1.5" stroke-dasharray="5 3" opacity="1"/>
-<text x="1476" y="1084" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="600" text-anchor="start" fill="#5b6675">snet-pe  10.100.5.0/26   NSG: 443 only from workload, agw, apim subnets</text>
-<rect x="1476" y="1094" width="99" height="48" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
-<text x="1484" y="1114" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">pe-kv</text>
-<text x="1484" y="1132" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">private endpoint</text>
-<rect x="1583" y="1094" width="99" height="48" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
-<text x="1591" y="1114" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">pe-blob</text>
-<text x="1591" y="1132" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">private endpoint</text>
-<rect x="1690" y="1094" width="99" height="48" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
-<text x="1698" y="1114" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">pe-oai</text>
-<text x="1698" y="1132" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">private endpoint</text>
-<rect x="1797" y="1094" width="99" height="48" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
-<text x="1805" y="1114" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">pe-srch</text>
-<text x="1805" y="1132" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">private endpoint</text>
-<rect x="1904" y="1094" width="99" height="48" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
-<text x="1912" y="1114" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">pe-cs</text>
-<text x="1912" y="1132" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">private endpoint</text>
-<text x="1454" y="1192" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#b7791f">PaaS (public network access disabled; reached only through the private endpoints above)</text>
-<rect x="1454" y="1202" width="185" height="160" rx="6" fill="#ffffff" stroke="#c0392b" stroke-width="2" opacity="1"/>
-<text x="1462" y="1222" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">Azure OpenAI</text>
-<text x="1462" y="1240" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">oai-&lt;client&gt; </text>
-<text x="1462" y="1254" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">(modules/ai-services)</text>
-<text x="1462" y="1268" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">local auth OFF, Entra only</text>
-<text x="1462" y="1282" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">outbound restricted to own</text>
-<text x="1462" y="1296" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Search + blob hosts</text>
-<text x="1462" y="1310" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">chat: gpt-4o (DataZoneStandard)</text>
-<text x="1462" y="1324" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">embeddings:</text>
-<text x="1462" y="1338" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">text-embedding-3-large</text>
-<text x="1462" y="1352" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">NoAutoUpgrade (ring rollout)</text>
-<rect x="1647" y="1202" width="185" height="160" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
-<text x="1655" y="1222" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">Key Vault (Premium)</text>
-<text x="1655" y="1240" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">RBAC mode, purge protection</text>
-<text x="1655" y="1254" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">TLS certs, 3rd-party secrets</text>
-<text x="1655" y="1268" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Secrets User: app, agw,</text>
-<text x="1655" y="1282" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">AKS app-routing</text>
-<rect x="1840" y="1202" width="185" height="160" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
-<text x="1848" y="1222" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">Storage (documents)</text>
-<text x="1848" y="1240" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">shared keys OFF, ZRS</text>
-<text x="1848" y="1254" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">versioning + soft delete</text>
-<text x="1848" y="1268" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">infra double encryption</text>
-<text x="1848" y="1282" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Blob Data Contributor: app</text>
-<rect x="1454" y="1370" width="185" height="76" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
-<text x="1462" y="1390" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">Azure AI Search</text>
-<text x="1462" y="1408" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">keys OFF, 3 replicas (SLA)</text>
-<text x="1462" y="1422" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">own MI -&gt; blob, AOAI</text>
-<text x="1462" y="1436" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Index Data Reader: app</text>
-<rect x="1647" y="1370" width="185" height="76" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
-<text x="1655" y="1390" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">Content Safety</text>
-<text x="1655" y="1408" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Prompt Shields for</text>
-<text x="1655" y="1422" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">the AI gateway</text>
-<text x="1655" y="1436" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">keys OFF</text>
-<text x="1454" y="1472" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#b7791f">Managed identities (no secrets anywhere)</text>
-<rect x="1454" y="1482" width="185" height="76" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
-<text x="1462" y="1502" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">id-&lt;client&gt;-app</text>
-<text x="1462" y="1520" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">workload: KV, blob, Search,</text>
-<text x="1462" y="1534" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">metrics; AKS: federated to</text>
-<text x="1462" y="1548" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">advisor:advisor-api</text>
-<rect x="1647" y="1482" width="185" height="76" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
-<text x="1655" y="1502" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">APIM system MI</text>
-<text x="1655" y="1520" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">OpenAI User on each</text>
-<text x="1655" y="1534" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">backend; CS User;</text>
-<text x="1655" y="1548" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">App Insights publisher</text>
-<rect x="1840" y="1482" width="185" height="76" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
-<text x="1848" y="1502" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">id-&lt;client&gt;-agw</text>
-<text x="1848" y="1520" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Key Vault Secrets User</text>
-<text x="1848" y="1534" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">(listener cert only)</text>
-<text x="1454" y="1584" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#b7791f">Operations and guardrails in this subscription</text>
-<rect x="1454" y="1594" width="185" height="120" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
-<text x="1462" y="1614" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">Log Analytics + App</text>
-<text x="1462" y="1630" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">Insights</text>
-<text x="1462" y="1648" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">retention 365 days (client</text>
-<text x="1462" y="1662" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">records policy)</text>
-<text x="1462" y="1676" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">diag: KV, AOAI, blob, Search,</text>
-<text x="1462" y="1690" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">AGW/WAF, APIM, AKS audit</text>
-<text x="1462" y="1704" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">local auth OFF</text>
-<rect x="1647" y="1594" width="185" height="120" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
-<text x="1655" y="1614" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">Alerts + budget</text>
-<text x="1655" y="1632" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">AOAI 429 rate, tokens vs quota,</text>
-<text x="1655" y="1646" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">5xx, KV Forbidden</text>
-<text x="1655" y="1660" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">budget USD 5,000 / month</text>
-<text x="1655" y="1674" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">-&gt; shared action group</text>
-<rect x="1840" y="1594" width="185" height="120" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
-<text x="1848" y="1614" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">Locks + RBAC</text>
-<text x="1848" y="1632" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">CanNotDelete on KV, storage,</text>
-<text x="1848" y="1646" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">AOAI</text>
-<text x="1848" y="1660" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Reader group: standing</text>
-<text x="1848" y="1674" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Operators: PIM only</text>
-<text x="1454" y="1736" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="600" text-anchor="start" fill="#5b6675">Config: terraform/clients/acme/  ~40 lines  |  state: tfstate-acme  |  deploy: id-deploy-acme</text>
+<rect x="1466" y="672" width="548" height="232" rx="8" fill="#ffffff" stroke="#d9b98a" stroke-width="1.5" stroke-dasharray="5 3" opacity="1"/>
+<text x="1476" y="690" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="600" text-anchor="start" fill="#5b6675">snet-apps  10.100.4.0/24   delegated to Microsoft.App/environments</text>
+<rect x="1476" y="700" width="528" height="62" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
+<text x="1484" y="720" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">Container Apps environment (internal LB, workload profiles)</text>
+<text x="1484" y="738" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">modules/container-apps; zone redundant; static internal IP; private DNS zone for the env domain; logs</text>
+<text x="1484" y="752" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">to the client Log Analytics workspace</text>
+<rect x="1476" y="772" width="259" height="76" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
+<text x="1484" y="792" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">ca-&lt;client&gt;-api</text>
+<text x="1484" y="810" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">User-assigned id-&lt;client&gt;-app</text>
+<text x="1484" y="824" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Image by digest from shared ACR</text>
+<text x="1484" y="838" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">AZURE_OPENAI_ENDPOINT = AI gateway URL</text>
+<rect x="1745" y="772" width="259" height="76" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
+<text x="1753" y="792" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">Container Apps Jobs</text>
+<text x="1753" y="810" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Ingestion / indexing</text>
+<text x="1753" y="824" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Evaluation runs</text>
+<text x="1753" y="838" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Same identity, same limits</text>
+<text x="1476" y="866" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">App calls models only through the AI gateway (no direct model role).</text>
+<text x="1476" y="882" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">Key Vault, Storage and Search via private endpoints, resource-scoped roles.</text>
+<rect x="1466" y="914" width="548" height="156" rx="8" fill="#ffffff" stroke="#d9b98a" stroke-width="1.5" stroke-dasharray="5 3" opacity="1"/>
+<text x="1476" y="932" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="600" text-anchor="start" fill="#5b6675">snet-apim  10.100.5.64/26   NSG: ApiManagement:3443, AzureLB:6390, 443 from workload</text>
+<rect x="1476" y="942" width="528" height="118" rx="6" fill="#ffffff" stroke="#c0392b" stroke-width="2" opacity="1"/>
+<text x="1484" y="962" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">AI gateway: API Management, internal VNet (modules/ai-gateway)</text>
+<text x="1484" y="980" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Premium_1 (zones), 40k TPM, Prompt Shields</text>
+<text x="1484" y="994" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">validate-azure-ad-token (only id-&lt;client&gt;-app, no keys) -&gt; llm-content-safety (Prompt Shields) -&gt;</text>
+<text x="1484" y="1008" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">llm-token-limit per caller</text>
+<text x="1484" y="1022" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">llm-emit-token-metric (Client, CallerAppId) -&gt; managed identity to models -&gt; backend aoai-primary</text>
+<text x="1484" y="1036" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Circuit breaker per backend (429/5xx, honours Retry-After); prompt bodies not logged by default</text>
+<text x="1484" y="1050" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Private DNS zone &lt;apim&gt;.azure-api.net; gateway + token logs -&gt; client LAW / App Insights</text>
+<rect x="1466" y="1080" width="548" height="86" rx="8" fill="#ffffff" stroke="#d9b98a" stroke-width="1.5" stroke-dasharray="5 3" opacity="1"/>
+<text x="1476" y="1098" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="600" text-anchor="start" fill="#5b6675">snet-pe  10.100.5.0/26   NSG: 443 only from workload, agw, apim subnets</text>
+<rect x="1476" y="1108" width="99" height="48" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
+<text x="1484" y="1128" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">pe-kv</text>
+<text x="1484" y="1146" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">private endpoint</text>
+<rect x="1583" y="1108" width="99" height="48" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
+<text x="1591" y="1128" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">pe-blob</text>
+<text x="1591" y="1146" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">private endpoint</text>
+<rect x="1690" y="1108" width="99" height="48" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
+<text x="1698" y="1128" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">pe-oai</text>
+<text x="1698" y="1146" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">private endpoint</text>
+<rect x="1797" y="1108" width="99" height="48" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
+<text x="1805" y="1128" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">pe-srch</text>
+<text x="1805" y="1146" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">private endpoint</text>
+<rect x="1904" y="1108" width="99" height="48" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
+<text x="1912" y="1128" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">pe-cs</text>
+<text x="1912" y="1146" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">private endpoint</text>
+<text x="1454" y="1206" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#b7791f">PaaS (public network access disabled; reached only through the private endpoints above)</text>
+<rect x="1454" y="1216" width="185" height="160" rx="6" fill="#ffffff" stroke="#c0392b" stroke-width="2" opacity="1"/>
+<text x="1462" y="1236" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">Azure OpenAI</text>
+<text x="1462" y="1254" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">oai-&lt;client&gt; </text>
+<text x="1462" y="1268" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">(modules/ai-services)</text>
+<text x="1462" y="1282" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">local auth OFF, Entra only</text>
+<text x="1462" y="1296" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">outbound restricted to own</text>
+<text x="1462" y="1310" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Search + blob hosts</text>
+<text x="1462" y="1324" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">chat: gpt-4o (DataZoneStandard)</text>
+<text x="1462" y="1338" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">embeddings:</text>
+<text x="1462" y="1352" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">text-embedding-3-large</text>
+<text x="1462" y="1366" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">NoAutoUpgrade (ring rollout)</text>
+<rect x="1647" y="1216" width="185" height="160" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
+<text x="1655" y="1236" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">Key Vault (Premium)</text>
+<text x="1655" y="1254" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">RBAC mode, purge protection</text>
+<text x="1655" y="1268" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">TLS certs, 3rd-party secrets</text>
+<text x="1655" y="1282" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Secrets User: app, agw,</text>
+<text x="1655" y="1296" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">AKS app-routing</text>
+<rect x="1840" y="1216" width="185" height="160" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
+<text x="1848" y="1236" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">Storage (documents)</text>
+<text x="1848" y="1254" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">shared keys OFF, ZRS</text>
+<text x="1848" y="1268" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">versioning + soft delete</text>
+<text x="1848" y="1282" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">infra double encryption</text>
+<text x="1848" y="1296" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Blob Data Contributor: app</text>
+<rect x="1454" y="1384" width="185" height="76" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
+<text x="1462" y="1404" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">Azure AI Search</text>
+<text x="1462" y="1422" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">keys OFF, 3 replicas (SLA)</text>
+<text x="1462" y="1436" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">own MI -&gt; blob, AOAI</text>
+<text x="1462" y="1450" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Index Data Reader: app</text>
+<rect x="1647" y="1384" width="185" height="76" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
+<text x="1655" y="1404" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">Content Safety</text>
+<text x="1655" y="1422" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Prompt Shields for</text>
+<text x="1655" y="1436" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">the AI gateway</text>
+<text x="1655" y="1450" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">keys OFF</text>
+<text x="1454" y="1486" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#b7791f">Managed identities (no secrets anywhere)</text>
+<rect x="1454" y="1496" width="185" height="76" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
+<text x="1462" y="1516" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">id-&lt;client&gt;-app</text>
+<text x="1462" y="1534" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">workload: KV, blob, Search,</text>
+<text x="1462" y="1548" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">metrics; AKS: federated to</text>
+<text x="1462" y="1562" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">advisor:advisor-api</text>
+<rect x="1647" y="1496" width="185" height="76" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
+<text x="1655" y="1516" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">APIM system MI</text>
+<text x="1655" y="1534" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">OpenAI User on each</text>
+<text x="1655" y="1548" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">backend; CS User;</text>
+<text x="1655" y="1562" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">App Insights publisher</text>
+<rect x="1840" y="1496" width="185" height="76" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
+<text x="1848" y="1516" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">id-&lt;client&gt;-agw</text>
+<text x="1848" y="1534" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Key Vault Secrets User</text>
+<text x="1848" y="1548" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">(listener cert only)</text>
+<text x="1454" y="1598" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#b7791f">Operations and guardrails in this subscription</text>
+<rect x="1454" y="1608" width="185" height="120" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
+<text x="1462" y="1628" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">Log Analytics + App</text>
+<text x="1462" y="1644" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">Insights</text>
+<text x="1462" y="1662" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">retention 365 days (client</text>
+<text x="1462" y="1676" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">records policy)</text>
+<text x="1462" y="1690" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">diag: KV, AOAI, blob, Search,</text>
+<text x="1462" y="1704" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">AGW/WAF, APIM, AKS audit</text>
+<text x="1462" y="1718" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">local auth OFF</text>
+<rect x="1647" y="1608" width="185" height="120" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
+<text x="1655" y="1628" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">Alerts + budget</text>
+<text x="1655" y="1646" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">AOAI 429 rate, tokens vs quota,</text>
+<text x="1655" y="1660" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">5xx, KV Forbidden</text>
+<text x="1655" y="1674" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">budget USD 5,000 / month</text>
+<text x="1655" y="1688" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">-&gt; shared action group</text>
+<rect x="1840" y="1608" width="185" height="120" rx="6" fill="#ffffff" stroke="#c3cad4" stroke-width="1.2" opacity="1"/>
+<text x="1848" y="1628" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" text-anchor="start" fill="#1b2430">Locks + RBAC</text>
+<text x="1848" y="1646" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">CanNotDelete on KV, storage,</text>
+<text x="1848" y="1660" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">AOAI</text>
+<text x="1848" y="1674" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Reader group: standing</text>
+<text x="1848" y="1688" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="10" font-weight="400" text-anchor="start" fill="#5b6675">Operators: PIM only</text>
+<text x="1454" y="1750" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="600" text-anchor="start" fill="#5b6675">Config: terraform/clients/acme/  ~40 lines  |  state: tfstate-acme  |  deploy: id-deploy-acme</text>
 <rect x="2060" y="380" width="600" height="1468" rx="12" fill="#fbf3e6" stroke="#b7791f" stroke-width="2" opacity="1"/>
 <text x="2074" y="406" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#b7791f">Client subscription: meridian (asset manager)</text>
 <text x="2074" y="425" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">Ring 2  |  landing zone  |  compute: AKS (dedicated, private)  |  ingress: public</text>
@@ -577,27 +607,30 @@
 <text x="2695" y="1146" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">registry, state storage and CI. Never:</text>
 <text x="2695" y="1162" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">networks, models, vaults, data, logs,</text>
 <text x="2695" y="1178" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">gateways, clusters or pipeline identities.</text>
-<path d="M 375 480 L 423 480" fill="none" stroke="#6b5ca5" stroke-width="2.2" marker-end="url(#ah-6b5ca5)" stroke-linejoin="round"/>
-<path d="M 785 472 L 795 472 L 795 346 L 1470 346 L 1470 526 L 1476 526" fill="none" stroke="#6b5ca5" stroke-width="2.2" marker-end="url(#ah-6b5ca5)" stroke-linejoin="round"/>
-<circle cx="408" cy="480" r="12" fill="#6b5ca5"/>
-<text x="408" y="484.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="middle" fill="#ffffff">1</text>
-<path d="M 375 575 L 395 575 L 395 358 L 2090 358 L 2090 546 L 2096 546" fill="none" stroke="#6b5ca5" stroke-width="2.2" stroke-dasharray="8 5" marker-end="url(#ah-6b5ca5)" stroke-linejoin="round"/>
-<circle cx="395" cy="530" r="12" fill="#6b5ca5"/>
-<text x="395" y="534.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="middle" fill="#ffffff">2</text>
-<path d="M 375 760 L 410 760" fill="none" stroke="#6b5ca5" stroke-width="2.2" stroke-dasharray="3 4" marker-end="url(#ah-6b5ca5)" stroke-linejoin="round"/>
+<path d="M 375 480 L 392 480 L 392 490 L 423 490" fill="none" stroke="#6b5ca5" stroke-width="2.2" marker-end="url(#ah-6b5ca5)" stroke-linejoin="round"/>
+<path d="M 375 574 L 400 574 L 400 584 L 423 584" fill="none" stroke="#6b5ca5" stroke-width="2.2" marker-end="url(#ah-6b5ca5)" stroke-linejoin="round"/>
+<path d="M 425 502 L 416 502 L 416 700 L 423 700" fill="none" stroke="#6b5ca5" stroke-width="1.8" marker-end="url(#ah-6b5ca5)" stroke-linejoin="round"/>
+<path d="M 425 596 L 416 596 L 416 700 L 423 700" fill="none" stroke="#6b5ca5" stroke-width="1.8" marker-end="url(#ah-6b5ca5)" stroke-linejoin="round"/>
+<path d="M 785 686 L 795 686 L 795 346 L 1470 346 L 1470 526 L 1476 526" fill="none" stroke="#6b5ca5" stroke-width="2.2" marker-end="url(#ah-6b5ca5)" stroke-linejoin="round"/>
+<circle cx="408" cy="490" r="12" fill="#6b5ca5"/>
+<text x="408" y="494.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="middle" fill="#ffffff">1</text>
+<path d="M 375 779 L 396 779 L 396 358 L 2090 358 L 2090 546 L 2096 546" fill="none" stroke="#6b5ca5" stroke-width="2.2" stroke-dasharray="8 5" marker-end="url(#ah-6b5ca5)" stroke-linejoin="round"/>
+<circle cx="396" cy="739" r="12" fill="#6b5ca5"/>
+<text x="396" y="743.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="middle" fill="#ffffff">2</text>
+<path d="M 375 937 L 420 937" fill="none" stroke="#6b5ca5" stroke-width="2.2" stroke-dasharray="3 4" marker-end="url(#ah-6b5ca5)" stroke-linejoin="round"/>
 <path d="M 1350 740 L 1350 830" fill="none" stroke="#b7791f" stroke-width="2.6" marker-end="url(#ah-b7791f)" stroke-linejoin="round"/>
 <circle cx="1332" cy="782" r="12" fill="#b7791f"/>
 <text x="1332" y="786.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="middle" fill="#ffffff">3</text>
-<path d="M 1970 836 L 1970 926" fill="none" stroke="#b7791f" stroke-width="2.6" marker-end="url(#ah-b7791f)" stroke-linejoin="round"/>
-<circle cx="1952" cy="878" r="12" fill="#b7791f"/>
-<text x="1952" y="882.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="middle" fill="#ffffff">3</text>
+<path d="M 1970 850 L 1970 940" fill="none" stroke="#b7791f" stroke-width="2.6" marker-end="url(#ah-b7791f)" stroke-linejoin="round"/>
+<circle cx="1952" cy="892" r="12" fill="#b7791f"/>
+<text x="1952" y="896.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="middle" fill="#ffffff">3</text>
 <path d="M 2590 922 L 2590 996" fill="none" stroke="#b7791f" stroke-width="2.6" marker-end="url(#ah-b7791f)" stroke-linejoin="round"/>
 <circle cx="2572" cy="948" r="12" fill="#b7791f"/>
 <text x="2572" y="952.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="middle" fill="#ffffff">3</text>
-<path d="M 2032 440 L 2032 370 L 808 370 L 808 545 L 787 545" fill="none" stroke="#c0392b" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#ah-c0392b)" stroke-linejoin="round"/>
-<path d="M 2652 440 L 2652 370 L 808 370 L 808 545 L 787 545" fill="none" stroke="#c0392b" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#ah-c0392b)" stroke-linejoin="round"/>
-<circle cx="808" cy="610" r="12" fill="#c0392b"/>
-<text x="808" y="614.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="middle" fill="#ffffff">4</text>
+<path d="M 2032 440 L 2032 370 L 808 370 L 808 714 L 787 714" fill="none" stroke="#c0392b" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#ah-c0392b)" stroke-linejoin="round"/>
+<path d="M 2652 440 L 2652 370 L 808 370 L 808 714 L 787 714" fill="none" stroke="#c0392b" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#ah-c0392b)" stroke-linejoin="round"/>
+<circle cx="808" cy="760" r="12" fill="#c0392b"/>
+<text x="808" y="764.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="middle" fill="#ffffff">4</text>
 <rect x="30" y="1873" width="3240" height="290" rx="12" fill="#f3f1f8" stroke="#6b5ca5" stroke-width="2" opacity="1"/>
 <text x="44" y="1899" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#6b5ca5">Delivery: GitHub Actions (ADR 0008) and GitOps</text>
 <text x="44" y="1918" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">Same pipeline for every client; each job can only ever authenticate as its own client</text>
@@ -652,7 +685,7 @@
 <text x="2874" y="2005" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">digest ring by ring</text>
 <text x="2874" y="2020" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" text-anchor="start" fill="#5b6675">via app_image</text>
 <text x="45" y="2113" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">Apply identities: Contributor + RBAC Administrator limited by an ABAC condition to KV Secrets User, OpenAI User, Blob Data Contributor/Reader, Search Index Reader, Metrics Publisher, Reader, Network Contributor, Private DNS Zone Contributor, Managed Identity Operator, AKS RBAC Reader, Cognitive Services User (and AcrPull on the shared ACR only).</text>
-<rect x="30" y="2183" width="3240" height="115" rx="12" fill="#f3f1f8" stroke="#6b5ca5" stroke-width="2" opacity="1"/>
+<rect x="30" y="2183" width="3240" height="145" rx="12" fill="#f3f1f8" stroke="#6b5ca5" stroke-width="2" opacity="1"/>
 <text x="44" y="2209" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" font-weight="700" text-anchor="start" fill="#6b5ca5">Legend</text>
 <rect x="50" y="2231" width="34" height="22" rx="4" fill="#eaf2fd" stroke="#3b74c4" stroke-width="2" opacity="1"/>
 <text x="94" y="2247" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" text-anchor="start" fill="#1b2430">Owned by Platform Engineering (P&amp;T)</text>
@@ -666,7 +699,7 @@
 <text x="1414" y="2247" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="400" text-anchor="start" fill="#1b2430">Key security control</text>
 <circle cx="1612" cy="2242" r="12" fill="#6b5ca5"/>
 <text x="1612" y="2246.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="middle" fill="#ffffff">1</text>
-<text x="1630" y="2247" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#1b2430">Private user path: client network -&gt; ExpressRoute/VPN -&gt; hub -&gt; App Gateway WAF (private IP)</text>
+<text x="1630" y="2247" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#1b2430">Private routed path: client network -&gt; ExpressRoute/VPN gateway -&gt; hub firewall (one rule per client) -&gt; App Gateway WAF</text>
 <circle cx="2372" cy="2242" r="12" fill="#6b5ca5"/>
 <text x="2372" y="2246.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="middle" fill="#ffffff">2</text>
 <text x="2390" y="2247" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#1b2430">Public user path (opt-in): internet -&gt; App Gateway public IP, NSG + WAF allow-list</text>
@@ -676,5 +709,8 @@
 <circle cx="2372" cy="2270" r="12" fill="#c0392b"/>
 <text x="2372" y="2274.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="middle" fill="#ffffff">4</text>
 <text x="2390" y="2275" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#1b2430">Egress: every spoke workload subnet -&gt; hub firewall (UDR); spoke-to-spoke denied</text>
-<text x="50" y="2283" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">Sources: docs/adr/0001-0012, terraform/stamps/client, terraform/platform, terraform/clients/*. Addresses and names are the example configs; every value comes from a client&#x27;s ~40-line tfvars.</text>
+<circle cx="1612" cy="2298" r="12" fill="#6b5ca5"/>
+<text x="1612" y="2302.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="middle" fill="#ffffff">5</text>
+<text x="1630" y="2303" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#1b2430">Private Link path: client&#x27;s own Azure VNet -&gt; private endpoint -&gt; App Gateway Private Link (no hub routing)</text>
+<text x="50" y="2313" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">Sources: docs/adr/0001-0013, terraform/stamps/client, terraform/modules/hub-connectivity, terraform/platform, terraform/clients/*. Addresses and names are the example configs; every value comes from a client&#x27;s ~40-line tfvars.</text>
 </svg>
