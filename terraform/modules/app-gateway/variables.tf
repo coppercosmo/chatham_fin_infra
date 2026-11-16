@@ -132,3 +132,19 @@ variable "allowed_client_cidrs" {
 }
 
 variable "log_analytics_workspace_id" { type = string }
+
+variable "enable_private_link" {
+  type        = bool
+  default     = false
+  description = <<-EOT
+    Let the private frontend accept private endpoints from the client's own Azure subscriptions (ADR 0013).
+    Private Link doesn't work with the private-only deployment, so a control-plane public IP is created
+    with no listener on it.
+  EOT
+}
+
+variable "private_link_subnet_id" {
+  type        = string
+  default     = null
+  description = "Dedicated subnet for the Private Link IPs (snet-agw-pl). Can't be the App Gateway subnet."
+}

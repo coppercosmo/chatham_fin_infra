@@ -32,3 +32,38 @@ output "ai_gateway_private_dns_zone_id" {
   description = "Landing-zone mode: ask P&T to link this zone to the hub DNS resolver VNet."
   value       = try(module.ai_gateway[0].private_dns_zone_id, null)
 }
+
+# Client network connectivity (ADR 0013)
+output "hub_connectivity_request" {
+  description = <<-EOT
+    VPN/ExpressRoute clients: everything P&T's hub needs for this client, generated from this config so
+    nothing is retyped. Goes into the hub's `clients` map (terraform/hub). Secrets (VPN shared key,
+    ExpressRoute authorization key) are NOT here; they go straight into P&T's Key Vault.
+  EOT
+  value = local.client_routed ? {
+    client           = var.client
+    type             = local.cc.type
+    spoke_vnet_id    = module.network.vnet_id
+    spoke_prefix     = var.address_space
+    ingress_ip       = local.ingress_ip
+    host_name        = var.ingress.host_name
+    on_prem_prefixes = local.cc.on_prem_prefixes
+    vpn              = local.cc.vpn
+    expressroute     = local.cc.expressroute
+  } : null
+}
+
+output "private_link_offer" {
+  description = "privatelink clients: what the client needs to create their private endpoint, and whose endpoints we approve."
+  value = local.client_private_link ? {
+    app_gateway_id            = module.ingress[0].id
+    target_sub_resource       = module.ingress[0].private_link_target_sub_resource
+    host_name                 = var.ingress.host_name
+    consumer_subscription_ids = local.cc.private_link.consumer_subscription_ids
+  } : null
+}
+
+output "ingress_allowed_sources" {
+  description = "Sources admitted on 443 by the App Gateway subnet NSG."
+  value       = module.network.agw_allowed_source_prefixes
+}

@@ -61,5 +61,28 @@ variable "nsg_agw_name" {
 variable "ingress_allowed_source_prefixes" {
   type        = list(string)
   default     = ["VirtualNetwork"]
-  description = "Who may reach the Application Gateway on 443. Private ingress: VirtualNetwork (hub, ExpressRoute/VPN). Public ingress: client egress CIDRs or the AzureFrontDoor.Backend service tag."
+  description = <<-EOT
+    Who may reach the Application Gateway on 443. Private ingress over the hub: the client's own network
+    ranges (never the VirtualNetwork tag, which also matches every other client's network learned by the
+    shared hub gateway). Public ingress: client egress CIDRs or the AzureFrontDoor.Backend service tag.
+    The Private Link subnet is added automatically when enable_private_link_subnet is true.
+  EOT
+}
+
+variable "client_network_prefixes" {
+  type        = list(string)
+  default     = []
+  description = "Landing zone only: the client's own network ranges (as seen in Azure, after any NAT) that reach App Gateway through the hub. Routed back via the hub firewall."
+}
+
+variable "use_remote_gateways" {
+  type        = bool
+  default     = false
+  description = "Use the hub's ExpressRoute/VPN gateway (gateway transit). Needs a gateway in the hub and P&T's hub-side peering with allow_gateway_transit."
+}
+
+variable "enable_private_link_subnet" {
+  type        = bool
+  default     = false
+  description = "Create snet-agw-pl for App Gateway Private Link (client_connectivity = privatelink)."
 }

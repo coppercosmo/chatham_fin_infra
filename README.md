@@ -41,17 +41,23 @@ Log Analytics + App Insights, budget alerts, and delete locks. Two per-client ch
 - **AI gateway**: an internal API Management AI gateway between the app and its models, with
   per-caller token limits, token metering, backend failover and optional Prompt Shields
   (`ai_gateway = {...}`, ADR 0012).
+- **Client network**: how the client's own network reaches its App Gateway privately
+  (`client_connectivity`, ADR 0013): `privatelink` from the client's own Azure (preferred, no
+  routing), `expressroute` or `vpn` through Platform Engineering's hub with a firewall rule, NSG and
+  WAF allow-list per client, or `none`. Explained in plain words, with a networking glossary, in
+  [docs/architecture/client-connectivity.md](docs/architecture/client-connectivity.md).
 
 ## Repo layout
 | Path | What |
 |---|---|
 | `docs/adr/` | Architecture decisions and trade-offs ([index](docs/adr/README.md)) |
-| `docs/architecture/` | Diagrams: estate, stamp, request path ([overview](docs/architecture/overview.md)); full multi-client diagram in `diagram/` |
-| `docs/runbooks/` | Onboard / offboard a client, incident runbook |
+| `docs/architecture/` | Diagrams: estate, stamp, request path ([overview](docs/architecture/overview.md)); [client network connectivity](docs/architecture/client-connectivity.md); full multi-client diagram in `diagram/` |
+| `docs/runbooks/` | Onboard / offboard a client, connect a client's network, incident runbooks |
 | `docs/interview/` | Topic map, likely questions, 30/60/90, AI tooling notes |
-| `terraform/modules/` | Reusable modules: naming, spoke-network, private-endpoint, key-vault, storage, ai-services, ai-gateway, container-apps, aks, app-gateway, observability, workload-identity, deployment-identity |
+| `terraform/modules/` | Reusable modules: naming, spoke-network, private-endpoint, key-vault, storage, ai-services, ai-gateway, container-apps, aks, app-gateway, observability, workload-identity, deployment-identity, cidr-overlap, and hub-connectivity (proposed to Platform Engineering) |
 | `terraform/stamps/client/` | Root module: one complete isolated client environment, plus offline tests |
 | `terraform/platform/` | Shared platform subscription: state, ACR, per-client CI identities |
+| `terraform/hub/` | Reference connectivity hub (Platform Engineering owns the real one): gateways, firewall, DNS resolver, wired to `hub-connectivity` |
 | `terraform/clients/<code>/` | Per-client `terraform.tfvars`, `backend.hcl`, `client.json` (ring) |
 | `kubernetes/` | AKS path: internal NGINX controller, app with workload identity, default-deny network policy |
 | `policy/` | AI guardrail policy definitions proposed to Platform Engineering |
@@ -66,6 +72,7 @@ terraform validate
 terraform test          # mocked provider; asserts isolation/security properties
 cd ../../..
 scripts/test-client-configs.sh   # also type-checks every client config in terraform/clients
+cd terraform/hub && terraform init -backend=false && terraform test -var-file=terraform.tfvars.example
 ```
 
 Deploy a demo client into your own subscription (standalone mode, no hub required):
@@ -98,6 +105,9 @@ access. Per-client plan, ring deploy and drift jobs stay off until the repositor
 ## Status and known gaps
 - Validated with Terraform 1.9.8 and azurerm 4.81; all offline tests pass. Not yet applied to a
   live subscription. The client configs use placeholder subscription and object IDs.
+- Known gap found while building ADR 0013: Microsoft now requires subnet delegation to
+  `Microsoft.Network/applicationGateways` for private-only App Gateway deployments, which
+  `snet-agw` doesn't set yet for `frontend_mode = "private"` without Private Link.
 - Known gaps, not built yet: self-hosted runners for private data-plane access, Azure
   Monitor Private Link Scope, customer-managed keys per client, a Front Door Premium edge for
   internet-facing multi-region clients, Flux configuration for the AKS path, and two AI gateway

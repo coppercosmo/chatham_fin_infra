@@ -46,7 +46,8 @@ _MUTE = [False]  # True while a chip draws its parts, because a chip is one edit
 # draw.io's built-in Azure icon set (img/lib/azure2/...). First match on a chip title wins.
 ICONS = [
     ("Azure Firewall", "networking/Firewalls"), ("App Gateway", "networking/Application_Gateways"),
-    ("ExpressRoute", "networking/Virtual_Network_Gateways"), ("Private DNS Resolver", "networking/DNS_Private_Resolver"),
+    ("ExpressRoute", "networking/Virtual_Network_Gateways"), ("VPN gateway", "networking/Virtual_Network_Gateways"),
+    ("Private DNS Resolver", "networking/DNS_Private_Resolver"),
     ("privatelink", "networking/DNS_Zones"), ("Linked per-client zones", "networking/DNS_Zones"),
     ("DNS (P&T)", "networking/DNS_Zones"), ("Azure Bastion", "networking/Bastions"),
     ("DDoS", "networking/DDoS_Protection_Plans"), ("Azure Front Door", "networking/Front_Doors"),
@@ -267,28 +268,42 @@ COL_BOTTOM = []
 # ---------------------------------------------------------------- users / edge column
 ux, uw = 30, 360
 section(ux, top, uw, None, "Users and edge", "ext")
-chip(ux + 15, top + 60, uw - 30, 78, "acme analysts (insurance)",
-     ["Corporate network -> ExpressRoute / VPN", "-> Chatham hub (private only)", "acme.ai.<domain>"])
-chip(ux + 15, top + 155, uw - 30, 78, "meridian analysts (asset manager)",
-     ["Internet, from 198.51.100.0/24 only", "NSG + WAF IP allow-list", "meridian.ai.<domain>"])
-chip(ux + 15, top + 250, uw - 30, 62, "Chatham engagement team",
-     ["Corp network, Entra ID SSO + PIM"])
-chip(ux + 15, top + 330, uw - 30, 96, "Azure Front Door Premium (optional)",
+USER_Y = {}
+uy = top + 60
+for key, t, sub_, kw in [
+    ("acme", "acme analysts (insurance): ExpressRoute",
+     ["acme's own circuit -> hub ExpressRoute gateway", "-> firewall: acme ranges to acme AGW:443 only",
+      "acme.ai.<domain>, private only (ADR 0013)"], {}),
+    ("fabrikam", "fabrikam analysts (bank): site-to-site VPN",
+     ["IPsec IKEv2 to hub VPN gateway, BGP off", "home 172.16.40.0/24 NAT'd to 100.64.12.0/24",
+      "(same stamp as acme; column not drawn)"], {}),
+    ("woodgrove", "woodgrove analysts (bank on Azure): Private Link",
+     ["Private endpoint in woodgrove's OWN subscription", "-> App Gateway Private Link. No hub routing,",
+      "IP overlap irrelevant (column not drawn)"], {"sec": True}),
+    ("meridian", "meridian analysts (asset manager)",
+     ["Internet, from 198.51.100.0/24 only", "NSG + WAF IP allow-list", "meridian.ai.<domain>"], {}),
+    ("chatham", "Chatham engagement team", ["Corp network, Entra ID SSO + PIM"], {}),
+    ("fd", "Azure Front Door Premium (optional)",
      ["Global edge for internet, multi-region", "clients; WAF at edge; reaches the", "client App Gateway via Private Link"],
-     fill=C["pt_fill"], stroke=C["pt_stroke"])
-chip(ux + 15, top + 445, uw - 30, 80, "DNS (P&T)",
-     ["<client>.ai.<domain> -> App Gateway", "private IP (x.x.2.10) in client spoke"],
-     fill=C["pt_fill"], stroke=C["pt_stroke"])
-text(ux + 15, top + 560, "Identity for end users", 14, 700)
-lines(ux + 15, top + 582, [
+     {"fill": C["pt_fill"], "stroke": C["pt_stroke"]}),
+    ("dns", "DNS (P&T)",
+     ["<client>.ai.<domain> -> App Gateway", "private IP (x.x.2.10) in client spoke.", "Client DNS forwards only its own zone",
+      "to the resolver inbound IP 10.0.1.4"], {"fill": C["pt_fill"], "stroke": C["pt_stroke"]}),
+]:
+    h_ = chip(ux + 15, uy, uw - 30, None, t, sub_, **kw)
+    USER_Y[key] = (uy, h_)
+    uy += h_ + 14
+badge(ux + uw - 24, USER_Y["woodgrove"][0] + 14, 5, C["flow_user"])
+text(ux + 15, uy + 30, "Identity for end users", 14, 700)
+lines(ux + 15, uy + 52, [
     "Client staff sign in to the app with Entra ID",
     "(B2B guests or the client's own tenant via",
     "app registration); app enforces roles.",
     "No user ever reaches a model, vault or",
     "storage account directly.",
 ], 12, fill=C["muted"])
-text(ux + 15, top + 690, "Operators", 14, 700)
-lines(ux + 15, top + 712, [
+text(ux + 15, uy + 160, "Operators", 14, 700)
+lines(ux + 15, uy + 182, [
     "Readers: standing Reader + AKS RBAC Reader.",
     "Writers: PIM-elevated Contributor, time-",
     "bound, approved. Bastion (hub) for private",
@@ -299,29 +314,38 @@ lines(ux + 15, top + 712, [
 hx, hw = 410, 390
 section(hx, top, hw, None, "Connectivity subscription: hub VNet", "pt", "Owned by P&T (ADR 0002, 0003)")
 hub_items = [
-    ("ExpressRoute / VPN gateway", ["Client + Chatham private connectivity"]),
-    ("Azure Firewall (Premium)", ["0.0.0.0/0 from every spoke (UDR)", "FQDN allow-list egress, IDPS", "spoke-to-spoke DENIED"]),
-    ("Private DNS Resolver", ["Spokes use it as DNS server", "Forwards to privatelink zones"]),
+    ("ExpressRoute gateway (ErGw1AZ)", ["Client circuits linked by authorization key",
+                                        "VNet-to-VNet over circuits OFF;", "no circuit-to-circuit transit"]),
+    ("VPN gateway (VpnGw2AZ, active-active)", ["IPsec IKEv2 per client, BGP OFF so no", "client learns another's routes;",
+                                               "static NAT for overlapping ranges"]),
+    ("Azure Firewall (Premium)", ["0.0.0.0/0 from every spoke (UDR)", "GatewaySubnet: each spoke -> firewall",
+                                  "One rule per client: its ranges ->", "its own AGW IP:443. Default deny.",
+                                  "FQDN allow-list egress, IDPS", "spoke-to-spoke DENIED"]),
+    ("Private DNS Resolver", ["Spokes use it as DNS server", "Inbound endpoint 10.0.1.4 for client", "DNS conditional forwarders"]),
     ("privatelink.* Private DNS zones", ["vaultcore, openai, blob, search,", "cognitiveservices, azmk8s.io", "Records created by DINE policy"]),
-    ("Linked per-client zones", ["<apim>.azure-api.net, ACA env zone", "(linked to resolver VNet by P&T)"]),
+    ("Linked per-client zones", ["<client>.ai.<domain> -> AGW IP (routed", "clients), <apim>.azure-api.net, ACA env",
+                                 "zone (linked to resolver VNet by P&T)"]),
     ("Azure Bastion", ["Jump path to private AKS API", "and troubleshooting VMs"]),
     ("DDoS Network Protection plan", ["Applied to public IPs by policy"]),
 ]
 yy = top + 70
+HUB_Y = {}
 for t, s in hub_items:
     h = chip(hx + 15, yy, hw - 30, None, t, s, fill="#ffffff", stroke=C["pt_stroke"],
              sec=t.startswith("Azure Firewall"))
+    HUB_Y[" ".join(t.split(" ")[:2])] = (yy, h)
     yy += h + 14
 text(hx + 15, yy + 14, "Hub <-> spoke VNet peering", 14, 700)
 lines(hx + 15, yy + 36, [
     "Spoke side created by the stamp; hub side",
-    "by P&T. Spokes never peer with each other.",
+    "by P&T (modules/hub-connectivity). Gateway",
+    "transit only for ExpressRoute/VPN clients.",
+    "Spokes never peer with each other.",
     "Standalone mode (chatham sandbox): no",
     "peering, stamp creates its own privatelink",
     "zones, Azure-provided DNS.",
 ], 12, fill=C["muted"])
-HUB_FW = (hx + hw - 15, top + 170)
-HUB_ER = (hx + hw - 15, top + 95)
+FW_Y = HUB_Y["Azure Firewall"][0] + HUB_Y["Azure Firewall"][1] // 2
 
 # ---------------------------------------------------------------- client stamps
 clients = [
@@ -332,6 +356,7 @@ clients = [
          locks=False),
     dict(code="acme", title="Client subscription: acme (insurance)", ring=1, cidr="10.100.4.0/22",
          compute="aca", ingress="private", mode="landing zone", gpu=False, search=True, cs=True,
+         client_net="172.16.0.0/16",
          apim="Premium_1 (zones), 40k TPM, Prompt Shields", backends=["aoai-primary"],
          models=["chat: gpt-4o (DataZoneStandard)", "embeddings: text-embedding-3-large"],
          logs="365 days (client records policy)", budget="USD 5,000 / month", locks=True),
@@ -378,11 +403,13 @@ for i, cl in enumerate(clients):
 
     # snet-agw
     sy = vy + 36
-    sl = subnet(sy, f"snet-agw  {p}.{c3 + 2}.0/24   NSG: GatewayManager, AzureLB, 443 from approved sources")
+    src = f'{cl["client_net"]} only' if cl.get("client_net") else "approved sources"
+    sl = subnet(sy, f"snet-agw  {p}.{c3 + 2}.0/24   NSG: GatewayManager, AzureLB, 443 from {src}")
     if cl["ingress"]:
         fe = (f"Private frontend {p}.{c3 + 2}.10, no public IP" if cl["ingress"] == "private"
               else f"Public IP (zonal) + private {p}.{c3 + 2}.10; NSG + WAF allow-list")
-        a_sub = [fe, "Listener cert from client Key Vault via id-agw (versionless)",
+        a_sub = [fe] + ([f'Return route {cl["client_net"]} -> hub firewall'] if cl.get("client_net") else []) + [
+                 "Listener cert from client Key Vault via id-agw (versionless)",
                  "TLS 1.2+ policy, SNI, HTTPS re-encrypt to backend",
                  "Streaming on, 180s timeout, autoscale 1-5"]
         w_sub = ["Prevention mode; DRS 2.1 + Bot Manager 1.1",
@@ -578,20 +605,29 @@ for sl_, x_, y_, w_, f_, st_ in PENDING:
     rect(x_, y_, w_, bottom - y_, f_, st_, rx=12, sw=2, at=sl_)
 
 # ================================================================= flows across columns
-# 1 user -> App Gateway (private, via hub)
+# 1 client network -> hub gateway -> firewall -> App Gateway (private, ADR 0013)
 acme_agw = AGW_POS["acme"]
-arrow([(ux + uw - 15, top + 100), (hx + 13, top + 100)], C["flow_user"])
-arrow([(hx + hw - 15, top + 92), (hx + hw - 5, top + 92), (hx + hw - 5, top - 34),
+er_y = HUB_Y["ExpressRoute gateway"][0] + HUB_Y["ExpressRoute gateway"][1] // 2
+vpn_y = HUB_Y["VPN gateway"][0] + HUB_Y["VPN gateway"][1] // 2
+acme_y = USER_Y["acme"][0] + USER_Y["acme"][1] // 2
+fab_y = USER_Y["fabrikam"][0] + USER_Y["fabrikam"][1] // 2
+arrow([(ux + uw - 15, acme_y), (ux + uw + 2, acme_y), (ux + uw + 2, er_y), (hx + 13, er_y)], C["flow_user"])
+arrow([(ux + uw - 15, fab_y), (ux + uw + 10, fab_y), (ux + uw + 10, vpn_y), (hx + 13, vpn_y)], C["flow_user"])
+for gy_ in (er_y, vpn_y):  # both gateways hand client traffic to the firewall (GatewaySubnet route)
+    arrow([(hx + 15, gy_ + 12), (hx + 6, gy_ + 12), (hx + 6, FW_Y), (hx + 13, FW_Y)], C["flow_user"], sw=1.8)
+arrow([(hx + hw - 15, FW_Y - 14), (hx + hw - 5, FW_Y - 14), (hx + hw - 5, top - 34),
        (acme_agw[0] - 6, top - 34), (acme_agw[0] - 6, acme_agw[1]), (acme_agw[0], acme_agw[1])], C["flow_user"])
-badge(hx - 2, top + 100, 1, C["flow_user"])
+badge(hx - 2, er_y, 1, C["flow_user"])
 # 2 internet -> meridian AGW public IP
 mer_agw = AGW_POS["meridian"]
-arrow([(ux + uw - 15, top + 195), (ux + uw + 5, top + 195), (ux + uw + 5, top - 22),
+mer_y = USER_Y["meridian"][0] + USER_Y["meridian"][1] // 2
+arrow([(ux + uw - 15, mer_y), (ux + uw + 6, mer_y), (ux + uw + 6, top - 22),
        (mer_agw[0] - 6, top - 22), (mer_agw[0] - 6, mer_agw[1] + 20), (mer_agw[0], mer_agw[1] + 20)],
       C["flow_user"], dash="8 5")
-badge(ux + uw + 5, top + 150, 2, C["flow_user"])
+badge(ux + uw + 6, mer_y - 40, 2, C["flow_user"])
 # 3 front door (optional) private link
-arrow([(ux + uw - 15, top + 380), (ux + uw + 20, top + 380)], C["flow_user"], dash="3 4")
+fd_y = USER_Y["fd"][0] + USER_Y["fd"][1] // 2
+arrow([(ux + uw - 15, fd_y), (ux + uw + 30, fd_y)], C["flow_user"], dash="3 4")
 
 # 4/5 app -> APIM -> AOAI (drawn inside each client)
 for cl in clients:
@@ -604,9 +640,9 @@ for cl in clients:
 for code in ("acme", "meridian"):
     i = [c["code"] for c in clients].index(code)
     x = cx0 + i * (cw + cg)
-    arrow([(x + cw - 8, top + 60), (x + cw - 8, top - 10), (hx + hw + 8, top - 10), (hx + hw + 8, top + 165),
-           (hx + hw - 13, top + 165)], C["flow_egress"], dash="6 4", sw=1.8)
-badge(hx + hw + 8, top + 230, 4, C["flow_egress"])
+    arrow([(x + cw - 8, top + 60), (x + cw - 8, top - 10), (hx + hw + 8, top - 10), (hx + hw + 8, FW_Y + 14),
+           (hx + hw - 13, FW_Y + 14)], C["flow_egress"], dash="6 4", sw=1.8)
+badge(hx + hw + 8, FW_Y + 60, 4, C["flow_egress"])
 
 # ================================================================= 3. CI/CD band
 cy, ch = bottom + 25, 290
@@ -638,7 +674,7 @@ text(45, cy + 240, "Apply identities: Contributor + RBAC Administrator limited b
 
 # ================================================================= 4. legend
 ly = cy + ch + 20
-H = ly + 135  # canvas height follows the content
+H = ly + 165  # canvas height follows the content
 section(30, ly, W - 60, H - ly - 20, "Legend", "ext")
 lx = 50
 for kind, label in [("pt", "Owned by Platform Engineering (P&T)"),
@@ -651,16 +687,17 @@ for kind, label in [("pt", "Owned by Platform Engineering (P&T)"),
 rect(lx, ly + 48, 34, 22, "#ffffff", C["sec"], rx=4, sw=2)
 text(lx + 44, ly + 64, "Key security control", 13)
 lx += 230
-flows = [(1, C["flow_user"], "Private user path: client network -> ExpressRoute/VPN -> hub -> App Gateway WAF (private IP)"),
+flows = [(1, C["flow_user"], "Private routed path: client network -> ExpressRoute/VPN gateway -> hub firewall (one rule per client) -> App Gateway WAF"),
          (2, C["flow_user"], "Public user path (opt-in): internet -> App Gateway public IP, NSG + WAF allow-list"),
          (3, C["flow_model"], "Model path: app -> AI gateway (Entra token) -> Azure OpenAI private endpoint (gateway MI)"),
-         (4, C["flow_egress"], "Egress: every spoke workload subnet -> hub firewall (UDR); spoke-to-spoke denied")]
+         (4, C["flow_egress"], "Egress: every spoke workload subnet -> hub firewall (UDR); spoke-to-spoke denied"),
+         (5, C["flow_user"], "Private Link path: client's own Azure VNet -> private endpoint -> App Gateway Private Link (no hub routing)")]
 for k, (n, col, label) in enumerate(flows):
     fx = lx + (k % 2) * 760
     fy = ly + 50 + (k // 2) * 28
     badge(fx + 12, fy + 9, n, col)
     text(fx + 30, fy + 14, label, 12)
-text(50, ly + 100, "Sources: docs/adr/0001-0012, terraform/stamps/client, terraform/platform, terraform/clients/*. "
+text(50, ly + 130, "Sources: docs/adr/0001-0013, terraform/stamps/client, terraform/modules/hub-connectivity, terraform/platform, terraform/clients/*. "
      "Addresses and names are the example configs; every value comes from a client's ~40-line tfvars.", 12, fill=C["muted"])
 
 out.append("</svg>")

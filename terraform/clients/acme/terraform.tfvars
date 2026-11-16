@@ -10,6 +10,18 @@ hub = {
   vnet_id             = "/subscriptions/33333333-3333-3333-3333-333333333333/resourceGroups/rg-connectivity-hub/providers/Microsoft.Network/virtualNetworks/vnet-hub-eus2"
   firewall_private_ip = "10.0.0.4"
   dns_servers         = ["10.0.1.4"]
+  gateway_transit     = true # P&T's side applied (onboarding step 3, ADR 0013)
+}
+
+# Client network (ADR 0013): acme's analysts come in over acme's own ExpressRoute circuit, linked to
+# P&T's hub gateway with an authorization key acme issued (kept in P&T's Key Vault, never here).
+# 172.16.0.0/16 is admitted by the hub firewall, the App Gateway NSG and the WAF, to 10.100.6.10:443 only.
+client_connectivity = {
+  type             = "expressroute"
+  on_prem_prefixes = ["172.16.0.0/16"]
+  expressroute = {
+    circuit_id = "/subscriptions/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/resourceGroups/rg-acme-network/providers/Microsoft.Network/expressRouteCircuits/er-acme-nyc"
+  }
 }
 
 reader_group_object_id = "44444444-4444-4444-4444-444444444444"
@@ -35,8 +47,8 @@ ai_gateway = {
   enable_content_safety = true
 }
 
-# Private ingress: users reach acme.ai.<domain> over the hub (ExpressRoute/VPN or Front Door
-# Premium Private Link). P&T's DNS points the name at the App Gateway private IP (10.100.6.10).
+# Private ingress: users reach acme.ai.<domain> over the hub (ExpressRoute above). The hub's
+# private DNS zone for the name points at the App Gateway private IP (10.100.6.10).
 ingress = {
   host_name             = "acme.ai.chatham.example.com"
   certificate_secret_id = "https://kv-acme-prd-eus2-ab12.vault.azure.net/secrets/acme-ai-tls"

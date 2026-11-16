@@ -150,3 +150,72 @@ numbers, then a pilot client, with explicit exit criteria before it becomes the 
 **"Semantic caching?"**
 Useful for FAQ-style apps, but within a client it can hand one user's answer to another user, so
 it's per client, varied by user or group, and enabled per solution after review, not by default.
+
+## Client network connectivity (ADR 0013)
+
+**"A client wants their analysts to reach the app privately from their own network. What are the options?"**
+Four, set per client with one input. If they're already on Azure, Private Link: they create a
+private endpoint in their own subscription that connects to their App Gateway, and we approve it.
+If not, ExpressRoute (their circuit linked to P&T's hub gateway) or a site-to-site VPN to the hub.
+Or nothing private, for internet users behind a locked-down public frontend. I lead with Private
+Link because it isn't routing at all. See `docs/architecture/client-connectivity.md`.
+
+**"What does 'Layer 3' mean when people say ExpressRoute is a Layer 3 service?"**
+It's the network layer: IP addresses and routing. ExpressRoute doesn't stretch the client's LAN into
+Azure (that would be Layer 2); it connects two separate IP networks with routers that exchange
+routes over BGP. That's why address ranges can't overlap: a router can't send a reply to a range
+that exists on both sides.
+
+**"Why is Private Link your first choice?"**
+Nothing is routed, so nothing is shared. The client's network never learns our ranges, our hub never
+learns theirs, overlapping addresses don't matter, and the only thing reachable is the one frontend
+the endpoint points at. Access is an approval we can see and revoke. Most banks and insurers already
+have ExpressRoute into their own Azure, so their users get there over a path they already run.
+
+**"You connect several clients to one shared hub. How do you stop client A reaching client B?"**
+Layers, all generated from one list of the client's ranges so they can't drift. The GatewaySubnet
+sends every spoke's traffic to the firewall. The firewall has one rule per client: its ranges to its
+own App Gateway IP on 443, default deny. In the client's spoke, the App Gateway NSG and the WAF
+allow-list admit only that client's ranges, never the `VirtualNetwork` tag, which would match every
+network the hub gateway has learned. Replies go back through the firewall. And Terraform refuses to
+plan if any ranges overlap.
+
+**"Why is BGP off on the VPN tunnels? Isn't BGP best practice?"**
+For a company's own branches, yes. On a gateway shared by competing clients, BGP passes routes learned
+from one peer to all the others, so client A would learn how to reach client B's office. With static
+routes the gateway has nothing to pass on. I check `list-advertised-routes` per client during onboarding.
+
+**"Two clients both use 172.16.0.0/16 internally. Now what?"**
+VPN: the hub VPN gateway does static 1:1 NAT, so one of them appears in Azure as a unique
+`100.64.x.0/24` from P&T's IPAM, and every Azure-side control uses the translated range. ExpressRoute
+gateways can't NAT, so that client advertises a unique range from their edge, or uses Private Link,
+where overlap doesn't matter. CI catches the clash before Azure does.
+
+**"Why the firewall in the path? The NSG already restricts it."**
+Defence in depth across ownership boundaries. The firewall rule is P&T's control in their
+subscription; the NSG and WAF are ours in the client's subscription. A mistake in one doesn't open
+the path. The cost is that firewall routing must be symmetric, so the App Gateway subnet has a route
+table sending replies to client ranges back through the firewall, with gateway propagation off.
+
+**"What can a connected client still see that you'd rather they didn't?"**
+The ExpressRoute gateway advertises every gateway-transit spoke to every circuit, so acme's routers
+learn that other spoke prefixes exist, and the DNS resolver will answer other clients' host names.
+Neither gives access. If a client's risk team won't accept that, Private Link removes both, or a
+dedicated hub for that client as a recorded exception.
+
+**"Who does what, given P&T owns the hub?"**
+Our stamp generates `hub_connectivity_request`: spoke range, App Gateway IP, host name, client ranges,
+circuit ID or VPN device IP. P&T pastes it into their hub's `clients` map, adds a firewall priority,
+and applies our proposed `hub-connectivity` module. Secrets (VPN key, ExpressRoute authorization key)
+go from the client straight to P&T's Key Vault, never through us. Then we flip gateway transit on.
+Three applies, two teams, no retyped IPs.
+
+**"ExpressRoute or VPN for a new client?"**
+ExpressRoute if they have it or need predictable latency and an SLA; VPN for smaller clients, a fast
+start, or as ExpressRoute's backup. Both share the hub gateways' bandwidth, so I'd watch per-connection
+throughput, because a heavy document-upload client is a noisy neighbour.
+
+**"Anything surprising you hit?"**
+App Gateway Private Link isn't supported on the private-only App Gateway deployment, so a Private Link
+gateway keeps a public IP for Azure's control plane with no listener on it. And Private Link to App
+Gateway has a ~5 minute idle timeout, which matters for long LLM calls: clients need TCP keepalives.

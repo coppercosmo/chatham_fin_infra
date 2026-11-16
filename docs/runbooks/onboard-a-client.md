@@ -31,6 +31,12 @@ engineering time** (elapsed time depends on P&T vending and AOAI quota).
 - [ ] Decide prompt/response body logging with the engagement lead (default off)
 - [ ] P&T: link the `<apim>.azure-api.net` private DNS zone to the hub resolver VNet (landing zone)
 
+## 1e. Client network (ADR 0013)
+- [ ] Ask the client: are you on Azure already? If yes, plan on `privatelink` (no hub work, no IP planning)
+- [ ] Otherwise `expressroute` (they have a circuit) or `vpn`; collect their user ranges, VPN device IP or
+      circuit ID, and check the ranges against IPAM. Overlap means NAT (VPN) or a unique advertised range (ExpressRoute)
+- [ ] Follow [connect-client-network.md](connect-client-network.md) for the three-step hub handover
+
 ## 2. Request quota
 - [ ] Azure OpenAI quota for each model in `terraform.tfvars` in the target region and SKU
 - [ ] Note any data-residency or abuse-monitoring requirements from the client contract

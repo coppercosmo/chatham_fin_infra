@@ -42,6 +42,72 @@ locals {
 
   use_ai_gateway = var.ai_gateway != null
   content_safety = try(var.ai_gateway.enable_content_safety, false)
+
+  # ---- Client network connectivity (ADR 0013)
+  cc                  = var.client_connectivity
+  client_routed       = contains(["vpn", "expressroute"], local.cc.type) # through P&T's shared hub
+  client_private_link = local.cc.type == "privatelink"                   # straight to this client's gateway
+  landing_zone        = var.connectivity_mode == "landing_zone"
+
+  # One list drives three controls in the spoke (the hub firewall rule is the fourth, in P&T's hub):
+  # the App Gateway NSG, the WAF allow-list and the return routes. A client routed through the hub is
+  # admitted from its own ranges only, never from the VirtualNetwork tag (which would also match every
+  # other client's network that the shared gateway has learned).
+  ingress_sources = (
+    local.client_routed ? local.cc.on_prem_prefixes
+    : local.client_private_link ? [] # the Private Link subnet is added by the network module
+    : try(var.ingress.allowed_source_prefixes, ["VirtualNetwork"])
+  )
+  waf_allowed_cidrs = (
+    local.client_routed && length(try(var.ingress.allowed_client_cidrs, [])) == 0
+    ? local.cc.on_prem_prefixes
+    : try(var.ingress.allowed_client_cidrs, [])
+  )
+  ingress_ip = var.ingress == null ? null : cidrhost(cidrsubnet(var.address_space, 2, 2), 10)
+}
+
+# Rules that span several inputs. Checked at plan time so a bad client config fails in the PR.
+module "client_network_overlap" {
+  source = "../../modules/cidr-overlap"
+  prefixes = {
+    "spoke ${var.address_space}" = [var.address_space]
+    "client network"             = local.client_routed ? local.cc.on_prem_prefixes : []
+  }
+}
+
+resource "terraform_data" "client_connectivity_contract" {
+  # Stored in state: what was agreed with P&T for this client's network path.
+  input = local.client_routed ? {
+    type             = local.cc.type
+    on_prem_prefixes = local.cc.on_prem_prefixes
+  } : { type = local.cc.type, on_prem_prefixes = [] }
+
+  lifecycle {
+    precondition {
+      condition     = !local.client_routed || local.landing_zone
+      error_message = "vpn and expressroute go through P&T's hub, so they need connectivity_mode = landing_zone. For a standalone demo use privatelink."
+    }
+    precondition {
+      condition     = local.cc.type == "none" || var.ingress != null
+      error_message = "client_connectivity needs ingress: the client's network connects to this client's App Gateway."
+    }
+    precondition {
+      condition     = local.cc.type == "none" || try(var.ingress.frontend_mode, "private") == "private"
+      error_message = "A private path from the client's network goes with a private frontend (ingress.frontend_mode = private)."
+    }
+    precondition {
+      condition     = length(module.client_network_overlap.overlaps) == 0
+      error_message = "Client network overlaps this spoke: ${join("; ", module.client_network_overlap.overlaps)}. Use vpn.nat to translate it, or privatelink."
+    }
+  }
+}
+
+# Warning only: a routed client can't reach the spoke until gateway transit is on (onboarding step 3).
+check "gateway_transit_for_routed_clients" {
+  assert {
+    condition     = !(local.client_routed && local.landing_zone) || try(var.hub.gateway_transit, false)
+    error_message = "client_connectivity is ${local.cc.type} but hub.gateway_transit is false: hand output.hub_connectivity_request to P&T, then set gateway_transit = true once their side is applied."
+  }
 }
 
 resource "azurerm_resource_group" "this" {
@@ -67,7 +133,12 @@ module "network" {
 
   enable_ingress_subnet           = var.ingress != null
   nsg_agw_name                    = local.n.nsg_agw
-  ingress_allowed_source_prefixes = try(var.ingress.allowed_source_prefixes, ["VirtualNetwork"])
+  ingress_allowed_source_prefixes = local.ingress_sources
+
+  # Client network connectivity (ADR 0013)
+  use_remote_gateways        = local.client_routed && try(var.hub.gateway_transit, false)
+  client_network_prefixes    = local.client_routed ? local.cc.on_prem_prefixes : []
+  enable_private_link_subnet = local.client_private_link
 
   tags = local.tags
 }
@@ -356,10 +427,12 @@ module "ingress" {
   zones               = var.zone_redundant ? ["1", "2", "3"] : null
   tags                = local.tags
 
-  subnet_id          = module.network.agw_subnet_id
-  private_ip_address = cidrhost(module.network.agw_subnet_prefix, 10)
-  frontend_mode      = var.ingress.frontend_mode
-  host_name          = var.ingress.host_name
+  subnet_id              = module.network.agw_subnet_id
+  private_ip_address     = local.ingress_ip
+  frontend_mode          = var.ingress.frontend_mode
+  host_name              = var.ingress.host_name
+  enable_private_link    = local.client_private_link
+  private_link_subnet_id = local.client_private_link ? module.network.agw_private_link_subnet_id : null
 
   key_vault_id          = module.key_vault.id
   certificate_secret_id = var.ingress.certificate_secret_id
@@ -373,7 +446,7 @@ module "ingress" {
   waf_mode                    = var.ingress.waf_mode
   waf_prompt_field_exclusions = var.ingress.waf_prompt_field_exclusions
   rate_limit_per_minute       = var.ingress.rate_limit_per_minute
-  allowed_client_cidrs        = var.ingress.allowed_client_cidrs
+  allowed_client_cidrs        = local.waf_allowed_cidrs
   autoscale = {
     min_capacity = var.ingress.min_capacity
     max_capacity = var.ingress.max_capacity

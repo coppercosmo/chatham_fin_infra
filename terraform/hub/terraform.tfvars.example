@@ -1,0 +1,46 @@
+# Reference hub inputs. In Chatham's estate these live in P&T's repo; each client entry is that
+# client stamp's `terraform output hub_connectivity_request` plus a P&T-assigned firewall_priority.
+subscription_id      = "33333333-3333-3333-3333-333333333333"
+location             = "eastus2"
+secrets_key_vault_id = "/subscriptions/33333333-3333-3333-3333-333333333333/resourceGroups/rg-connectivity-secrets/providers/Microsoft.KeyVault/vaults/kv-pt-connectivity"
+
+expressroute_gateway = { sku = "ErGw1AZ" }
+vpn_gateway          = { sku = "VpnGw2AZ", active_active = true }
+
+clients = {
+  # Insurance client with its own ExpressRoute circuit. Secret er-auth-acme holds the authorization
+  # key acme issued on that circuit for our gateway.
+  acme = {
+    type              = "expressroute"
+    spoke_vnet_id     = "/subscriptions/22222222-2222-2222-2222-222222222222/resourceGroups/rg-acme-prd-eus2/providers/Microsoft.Network/virtualNetworks/vnet-acme-prd-eus2"
+    spoke_prefix      = "10.100.4.0/22"
+    ingress_ip        = "10.100.6.10"
+    host_name         = "acme.ai.chatham.example.com"
+    on_prem_prefixes  = ["172.16.0.0/16"]
+    firewall_priority = 1000
+    expressroute = {
+      circuit_id     = "/subscriptions/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/resourceGroups/rg-acme-network/providers/Microsoft.Network/expressRouteCircuits/er-acme-nyc"
+      routing_weight = 0
+    }
+  }
+
+  # Regional bank over site-to-site VPN. Its real range overlaps acme's, so it is translated to a
+  # unique 100.64.x.x range on the VPN gateway. Secret vpn-psk-fabrikam holds the pre-shared key.
+  fabrikam = {
+    type              = "vpn"
+    spoke_vnet_id     = "/subscriptions/88888888-8888-8888-8888-888888888888/resourceGroups/rg-fabrikam-prd-eus2/providers/Microsoft.Network/virtualNetworks/vnet-fabrikam-prd-eus2"
+    spoke_prefix      = "10.100.12.0/22"
+    ingress_ip        = "10.100.14.10"
+    host_name         = "fabrikam.ai.chatham.example.com"
+    on_prem_prefixes  = ["100.64.12.0/24"]
+    firewall_priority = 1010
+    vpn = {
+      device_public_ip = "203.0.113.10"
+      nat              = [{ client_prefix = "172.16.40.0/24", azure_prefix = "100.64.12.0/24" }]
+    }
+  }
+
+  # Spokes whose users don't come through the hub still need the hub side of their peering.
+  meridian  = { type = "none", spoke_vnet_id = "/subscriptions/55555555-5555-5555-5555-555555555555/resourceGroups/rg-meridian-prd-eus2/providers/Microsoft.Network/virtualNetworks/vnet-meridian-prd-eus2", spoke_prefix = "10.100.8.0/22" }
+  woodgrove = { type = "privatelink", spoke_vnet_id = "/subscriptions/99999999-9999-9999-9999-999999999999/resourceGroups/rg-woodgrove-prd-eus2/providers/Microsoft.Network/virtualNetworks/vnet-woodgrove-prd-eus2", spoke_prefix = "10.100.16.0/22" }
+}

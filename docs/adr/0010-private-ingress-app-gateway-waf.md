@@ -1,6 +1,6 @@
 # ADR 0010: Private ingress through a per-client Application Gateway WAF_v2
 
-- Status: Accepted
+- Status: Accepted, amended by [0013](0013-client-network-connectivity.md) (how client networks reach the private frontend; Private Link gateways keep a control-plane public IP)
 - Date: 2026-11-15
 
 ## Context

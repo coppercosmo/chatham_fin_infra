@@ -58,8 +58,84 @@ variable "hub" {
     vnet_id             = string
     firewall_private_ip = string
     dns_servers         = list(string)
+    # true once P&T's hub-side peering allows gateway transit for this spoke (onboarding step 3 for
+    # VPN/ExpressRoute clients, ADR 0013). Until then the client's network can't reach the spoke.
+    gateway_transit = optional(bool, false)
   })
   default = null
+}
+
+# ---------- Client network connectivity (ADR 0013)
+# How the CLIENT's own network reaches this environment. Separate from connectivity_mode, which is
+# how this spoke attaches to Azure plumbing (P&T hub or standalone).
+variable "client_connectivity" {
+  description = <<-EOT
+    none:         no private path from the client's network (internet users with a public frontend, or
+                  Chatham-only access).
+    privatelink:  preferred for clients already on Azure. The client creates a private endpoint in THEIR
+                  subscription that connects to this client's App Gateway. No routing, no shared hub, IP
+                  overlap doesn't matter. Works in standalone and landing-zone mode.
+    vpn:          site-to-site IPsec tunnel from the client's firewall to P&T's hub VPN gateway.
+    expressroute: the client's ExpressRoute circuit linked to P&T's hub ExpressRoute gateway.
+
+    on_prem_prefixes (vpn/expressroute): the client's ranges AS SEEN IN AZURE (after any NAT). They become
+    the firewall rule, the App Gateway NSG and WAF allow-list, and the return routes. Must not overlap
+    this spoke or any other client.
+  EOT
+  type = object({
+    type             = string
+    on_prem_prefixes = optional(list(string), [])
+
+    vpn = optional(object({
+      device_public_ip = string # the client's VPN device
+      # Static 1:1 NAT for a client whose real range overlaps someone else's. client_prefix is what the
+      # client uses at home; azure_prefix is the unique range (from P&T IPAM, e.g. 100.64.0.0/10) that it
+      # becomes inside Azure, and must be listed in on_prem_prefixes.
+      nat = optional(list(object({
+        client_prefix = string
+        azure_prefix  = string
+      })), [])
+    }))
+
+    expressroute = optional(object({
+      circuit_id     = string # the client's circuit; they issue an authorization key for P&T's gateway
+      routing_weight = optional(number, 0)
+    }))
+
+    private_link = optional(object({
+      # The client's own subscriptions whose private endpoints we approve. Anything else is rejected.
+      consumer_subscription_ids = list(string)
+    }))
+  })
+  default = { type = "none" }
+
+  validation {
+    condition     = contains(["none", "privatelink", "vpn", "expressroute"], var.client_connectivity.type)
+    error_message = "client_connectivity.type must be none, privatelink, vpn or expressroute."
+  }
+  validation {
+    condition = !contains(["vpn", "expressroute"], var.client_connectivity.type) || (
+      length(var.client_connectivity.on_prem_prefixes) > 0 &&
+      alltrue([for p in var.client_connectivity.on_prem_prefixes : can(cidrhost(p, 0))])
+    )
+    error_message = "vpn and expressroute need on_prem_prefixes: the client's network ranges as CIDRs."
+  }
+  validation {
+    condition = alltrue([
+      var.client_connectivity.type != "vpn" || var.client_connectivity.vpn != null,
+      var.client_connectivity.type != "expressroute" || var.client_connectivity.expressroute != null,
+      var.client_connectivity.type != "privatelink" || var.client_connectivity.private_link != null,
+    ])
+    error_message = "Set the block that matches client_connectivity.type (vpn, expressroute or private_link)."
+  }
+  validation {
+    condition = alltrue([
+      for m in try(var.client_connectivity.vpn.nat, []) :
+      contains(var.client_connectivity.on_prem_prefixes, m.azure_prefix) &&
+      split("/", m.azure_prefix)[1] == split("/", m.client_prefix)[1]
+    ])
+    error_message = "Each vpn.nat azure_prefix must be listed in on_prem_prefixes and be the same size as its client_prefix (static 1:1 NAT)."
+  }
 }
 
 # ---------- Access (P&T-owned Entra groups, ADR 0004)

@@ -37,6 +37,12 @@ jobs:
           for t in terraform/modules/*/tests; do
             (cd "$(dirname "$t")" && terraform init -backend=false -input=false && terraform test)
           done
+      - name: reference hub (P&T owns the real one) validate + test with the example clients
+        working-directory: terraform/hub
+        run: |
+          terraform init -backend=false -input=false
+          terraform validate
+          terraform test -var-file=terraform.tfvars.example
       - uses: terraform-linters/setup-tflint@v4
       - run: tflint --init && tflint --recursive
       - name: checkov (policy as code, mirrors P&T guardrails)

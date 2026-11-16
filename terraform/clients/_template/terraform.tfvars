@@ -10,7 +10,15 @@ hub = {
   vnet_id             = "/subscriptions/<connectivity>/resourceGroups/<rg>/providers/Microsoft.Network/virtualNetworks/<hub>"
   firewall_private_ip = "10.0.0.4"
   dns_servers         = ["10.0.1.4"]
+  gateway_transit     = false # VPN/ExpressRoute clients: set true after P&T applies their side (ADR 0013)
 }
+
+# How the client's own network reaches this environment (ADR 0013). Pick one:
+#   { type = "none" }                                                   internet/Front Door, or Chatham-only
+#   { type = "privatelink", private_link = { consumer_subscription_ids = ["<client sub>"] } }   client on Azure (preferred)
+#   { type = "expressroute", on_prem_prefixes = [...], expressroute = { circuit_id = "<id>" } }  see clients/acme
+#   { type = "vpn", on_prem_prefixes = [...], vpn = { device_public_ip = "<ip>" } }             see clients/fabrikam
+client_connectivity = { type = "none" }
 
 reader_group_object_id = "CHANGEME" # sg-aiadv-<code>-readers (P&T)
 

@@ -10,6 +10,13 @@ locals {
   public          = var.frontend_mode == "public"
   listener_fe     = local.public ? "public" : "private"
   backend_is_fqdn = var.backend_fqdn != null
+  private_link    = var.enable_private_link
+
+  # App Gateway Private Link isn't supported on the private-only (network isolation) deployment,
+  # so a Private Link gateway keeps a public IP for Azure's control plane. Nothing listens on it:
+  # the only listener stays on the private frontend, and the subnet NSG never admits 443 from the
+  # internet (ADR 0013).
+  create_public_ip = local.public || local.private_link
 }
 
 # ---------------------------------------------------------------- identity for Key Vault
@@ -116,9 +123,9 @@ resource "azurerm_web_application_firewall_policy" "this" {
   }
 }
 
-# ---------------------------------------------------------------- public frontend (public mode only)
+# ---------------------------------------------------------------- public IP (public mode, or control plane only for Private Link)
 resource "azurerm_public_ip" "this" {
-  count               = local.public ? 1 : 0
+  count               = local.create_public_ip ? 1 : 0
   name                = var.public_ip_name
   location            = var.location
   resource_group_name = var.resource_group_name
@@ -166,14 +173,30 @@ resource "azurerm_application_gateway" "this" {
   }
 
   frontend_ip_configuration {
-    name                          = "private"
-    subnet_id                     = var.subnet_id
-    private_ip_address            = var.private_ip_address
-    private_ip_address_allocation = "Static"
+    name                            = "private"
+    subnet_id                       = var.subnet_id
+    private_ip_address              = var.private_ip_address
+    private_ip_address_allocation   = "Static"
+    private_link_configuration_name = local.private_link ? "private-link" : null
+  }
+
+  # Private Link (ADR 0013): a client's own Azure network reaches this frontend through a private
+  # endpoint in THEIR subscription. Target sub-resource for the endpoint = "private" (this frontend's name).
+  dynamic "private_link_configuration" {
+    for_each = local.private_link ? [1] : []
+    content {
+      name = "private-link"
+      ip_configuration {
+        name                          = "pl-ip-1"
+        subnet_id                     = var.private_link_subnet_id
+        private_ip_address_allocation = "Dynamic" # static isn't supported for Private Link IPs
+        primary                       = true
+      }
+    }
   }
 
   dynamic "frontend_ip_configuration" {
-    for_each = local.public ? [1] : []
+    for_each = local.create_public_ip ? [1] : []
     content {
       name                 = "public"
       public_ip_address_id = azurerm_public_ip.this[0].id
@@ -248,6 +271,10 @@ resource "azurerm_application_gateway" "this" {
   }
 
   lifecycle {
+    precondition {
+      condition     = !var.enable_private_link || var.private_link_subnet_id != null
+      error_message = "enable_private_link needs private_link_subnet_id (a subnet other than the gateway's)."
+    }
     precondition {
       condition     = (var.backend_fqdn == null) != (var.backend_ip == null)
       error_message = "Set exactly one of backend_fqdn (Container Apps) or backend_ip (AKS)."
