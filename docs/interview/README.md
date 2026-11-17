@@ -17,6 +17,7 @@ something real.
    [data isolation for AI](deep-dives/data-isolation-for-ai.md),
    [observability per client](deep-dives/observability-per-client.md),
    [landing zones and policy](deep-dives/landing-zones-and-policy.md),
+   [compliance standards in Defender for Cloud](../architecture/compliance-standards.md),
    [DR and capacity](deep-dives/dr-and-capacity.md).
 4. [Likely questions](likely-questions.md): Q&A for ingress, AKS, the AI gateway and client networks.
 5. [Mock technical test](practice/mock-technical-test.md): Terraform, networking, identity, design
