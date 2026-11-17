@@ -51,6 +51,12 @@ its indexes with the same ingestion job, running as each client's own identity, 
 has a content filter that blocks instructions hidden in documents
 ([ADR 0015](docs/adr/0015-document-ingestion.md)).
 
+**Compliance:** which regulatory standards Defender for Cloud would score (SOC 2, ISO 27001:2022 and NIST 800-53
+for everyone; DORA, NIST CSF 2.0, UK and AI standards per client), assigned once and report-only at the AI
+Advisory management group, with per-tier client evidence and a map from the repo's guardrails to the controls
+they satisfy: [docs/architecture/compliance-standards.md](docs/architecture/compliance-standards.md)
+([ADR 0016](docs/adr/0016-compliance-standards-defender-for-cloud.md), proposed to P&T).
+
 ## What a client gets (the "stamp")
 Spoke VNet peered to the hub, everything private: Azure OpenAI (data-zone deployments, keys off),
 AI Search, Storage, Key Vault, a user-assigned managed identity with resource-scoped roles, its own
@@ -73,10 +79,10 @@ Log Analytics + App Insights, budget alerts, and delete locks. Two per-client ch
 | Path | What |
 |---|---|
 | `docs/adr/` | Architecture decisions and trade-offs ([index](docs/adr/README.md)) |
-| `docs/architecture/` | Diagrams: estate, stamp, request path ([overview](docs/architecture/overview.md)); [the three tier diagrams side by side](docs/architecture/tiers-side-by-side.md); [client network connectivity](docs/architecture/client-connectivity.md); full multi-client, tier and AI request-flow diagrams in `diagram/` |
+| `docs/architecture/` | Diagrams: estate, stamp, request path ([overview](docs/architecture/overview.md)); [the three tier diagrams side by side](docs/architecture/tiers-side-by-side.md); [client network connectivity](docs/architecture/client-connectivity.md); [compliance standards](docs/architecture/compliance-standards.md); full multi-client, tier and AI request-flow diagrams in `diagram/` |
 | `docs/runbooks/` | Onboard / offboard a client, connect a client's network, incident runbooks |
 | `docs/interview/` | [Study guide](docs/interview/README.md): topic map, deep dives (including [the AI layer end to end](docs/interview/deep-dives/ai-architecture.md)), mock technical test, repo walkthrough, likely questions, 30/60/90 |
-| `terraform/modules/` | Reusable modules: naming, spoke-network, private-endpoint, key-vault, storage, ai-services, ai-gateway, container-apps, ingestion-job, aks, app-gateway, shared-app-gateway, observability, workload-identity, deployment-identity, cidr-overlap, policy-guardrails, and hub-connectivity (the last two proposed to Platform Engineering) |
+| `terraform/modules/` | Reusable modules: naming, spoke-network, private-endpoint, key-vault, storage, ai-services, ai-gateway, container-apps, ingestion-job, aks, app-gateway, shared-app-gateway, observability, workload-identity, deployment-identity, cidr-overlap, policy-guardrails, compliance-standards, and hub-connectivity (the last three proposed to Platform Engineering) |
 | `terraform/stamps/client/` | Tier 1 root module: one complete isolated client environment, plus offline tests |
 | `terraform/stamps/cell/`, `terraform/stamps/cell-client/` | Tier 2: the shared cell (per-client resource groups, sites, apps, gateway APIs) and each client's data in its own resource group |
 | `terraform/stamps/pool/` | Tier 3: the pooled app with per-tenant containers, indexes, identities and jobs |
@@ -86,7 +92,7 @@ Log Analytics + App Insights, budget alerts, and delete locks. Two per-client ch
 | `terraform/cells/<cell>/`, `terraform/pools/<pool>/` | Example Tier 2 and Tier 3 configs (`cells/cell01/clients/<client>.tfvars` per cell client) |
 | `terraform/exercises/` | Interview practice: a from-scratch VNet + private endpoints + private DNS, with tests |
 | `kubernetes/` | AKS path: internal NGINX controller, app with workload identity, default-deny network policy |
-| `policy/` | Guardrail policy definitions proposed to Platform Engineering, deployable as one initiative with `terraform/modules/policy-guardrails` |
+| `policy/` | Guardrail policy definitions proposed to Platform Engineering, deployable as one initiative with `terraform/modules/policy-guardrails`; custom compliance standards in `policy/standards/` (NYDFS Part 500), assigned with `terraform/modules/compliance-standards` |
 | `.github/workflows/` | PR checks + per-client plans, ring-based apply, nightly drift |
 
 ## Try it
@@ -145,6 +151,9 @@ access. Per-client plan, ring deploy and drift jobs stay off until the repositor
   the ingestion and index-admin jobs run an image from the application repo (placeholder digests here);
   index definitions are applied by a job, not Terraform; the shared tiers' `job-index-admin` is started by
   hand after onboarding; the evaluation pipeline is designed, not built.
+- Compliance standards (ADR 0016) are proposed to P&T and tested offline only. Turned on today, the
+  customer-managed-key checks in SOC 2, NIST 800-53 and DORA would fail (the CMK gap below), and the ISO 27001
+  score depends on which Defender plans P&T enable.
 - Known gaps, not built yet: self-hosted runners for private data-plane access, Azure
   Monitor Private Link Scope, customer-managed keys per client, a Front Door Premium edge for
   internet-facing multi-region clients, Flux configuration for the AKS path, and two AI gateway

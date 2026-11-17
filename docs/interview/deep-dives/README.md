@@ -11,6 +11,7 @@ definitions, how this repo handles it, and model answers. Read them in this orde
 | 4 | [Observability per client](observability-per-client.md) | Workspace per client vs shared; token showback through the gateway; alerts that gate rollout rings |
 | 5 | [Landing zones and policy](landing-zones-and-policy.md) | The ALZ management group tree; subscription vending; Deny vs Modify vs DeployIfNotExists; safe rollout |
 | 6 | [DR and capacity](dr-and-capacity.md) | RTO/RPO per tier; model failover through the gateway; pay-as-you-go vs PTU; capacity planning |
+| 7 | [Compliance standards in Defender for Cloud](../../architecture/compliance-standards.md) | Which standards to turn on and where; per-tier client evidence; how our guardrails map to SOC 2, ISO, NIST and DORA controls; Defender's AI posture and threat protection; what isn't built in |
 
 Then practise with the [mock technical test](../practice/mock-technical-test.md) and the
 [repo walkthrough](../repo-walkthrough.md).

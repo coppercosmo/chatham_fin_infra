@@ -223,3 +223,24 @@ throughput, because a heavy document-upload client is a noisy neighbour.
 App Gateway Private Link isn't supported on the private-only App Gateway deployment, so a Private Link
 gateway keeps a public IP for Azure's control plane with no listener on it. And Private Link to App
 Gateway has a ~5 minute idle timeout, which matters for long LLM calls: clients need TCP keepalives.
+
+## Compliance standards (ADR 0016)
+
+Full answers, with the control mapping and per-tier queries, in
+[compliance-standards.md](../architecture/compliance-standards.md#interview-questions-and-answers).
+
+**"Which Defender for Cloud compliance standards would this platform use?"**
+MCSB from P&T's root; SOC 2 Type 2, ISO 27001:2022 and NIST 800-53 Rev. 5 assigned once at the AI Advisory
+management group, report-only; DORA, NIST CSF 2.0, UK OFFICIAL or NCSC CAF per client at the client's scope.
+The EU AI Act and NIST AI RMF are built in but have 6 and 1 checks. NYDFS Part 500 and ISO 42001 aren't in
+Defender at all.
+
+**"How does that work when clients share a cell?"**
+Defender reports per subscription, which is one client only in Tier 1. In a cell I filter Azure Policy
+compliance to the client's resource group plus the shared resources, using the `client` tag the guardrails
+enforce, and assign a client-specific standard at its resource group.
+
+**"What's the catch with the dashboard?"**
+It covers the automated part of each framework only, and it scores the built-in checks, not our own deny
+rules. Turned on today, customer-managed keys would fail under SOC 2, NIST and DORA (a known gap, which MCSB
+hides because its CMK checks are off by default), so I'd record that as a dated exemption with an ADR.

@@ -1,0 +1,35 @@
+{
+  "displayName": "AI Advisory: NYDFS 23 NYCRR 500 (technical subset)",
+  "description": "Built-in Azure Policy checks grouped by the sections of NYDFS Part 500 that cloud configuration can evidence. Our own mapping, not Microsoft's and not legal advice: it covers configuration only; governance, CISO, risk assessment, training and notification sections need written evidence (Purview Compliance Manager has a premium template). Defender for Cloud has no built-in NYDFS standard. See docs/architecture/compliance-standards.md.",
+  "version": "0.1.0",
+  "category": "NYDFS 23 NYCRR Part 500",
+  "groups": {
+    "NYDFS_500.3": "500.3 Cybersecurity policy: systems and network security",
+    "NYDFS_500.5": "500.5 Vulnerability management",
+    "NYDFS_500.6": "500.6 Audit trail",
+    "NYDFS_500.7": "500.7 Access privileges and management",
+    "NYDFS_500.14": "500.14 Monitoring and training",
+    "NYDFS_500.15": "500.15 Encryption of nonpublic information",
+    "NYDFS_500.16": "500.16 Incident response and business continuity management"
+  },
+  "checks": [
+    { "ref": "ai-services-restrict-network", "id": "037eea7a-bd0a-46c5-9a66-03aea78705d3", "effect": "Audit", "groups": ["NYDFS_500.3"], "what": "Azure AI services restrict network access" },
+    { "ref": "ai-services-private-link", "id": "d6759c02-b87f-42b7-892e-71b3f471d782", "groups": ["NYDFS_500.3"], "what": "Azure AI services use Private Link" },
+    { "ref": "storage-private-link", "id": "6edd7eda-6dd8-40f7-810d-67160c639cd9", "effect": "AuditIfNotExists", "groups": ["NYDFS_500.3"], "what": "Storage accounts use a private link" },
+    { "ref": "ai-search-public-access-off", "id": "ee980b6d-0eca-4501-8d54-f6290fd512c3", "groups": ["NYDFS_500.3"], "what": "AI Search public network access disabled" },
+    { "ref": "defender-cspm", "id": "1f90fc71-a595-4066-8974-d4d0802e8ef0", "effect": "AuditIfNotExists", "groups": ["NYDFS_500.5"], "what": "Defender CSPM enabled (vulnerability and attack path analysis)" },
+    { "ref": "ai-services-diagnostic-logs", "id": "1b4d1c4e-934c-4703-944c-27c82c06bebb", "groups": ["NYDFS_500.6"], "what": "Diagnostic logs on Azure AI services" },
+    { "ref": "ai-services-local-auth-off", "id": "71ef260a-8f18-47b7-abcb-62d0673d94dc", "groups": ["NYDFS_500.7"], "what": "Azure AI services keys disabled (Entra ID only)" },
+    { "ref": "defender-storage", "id": "640d2586-54d2-465f-877f-9ffc1d2109f4", "groups": ["NYDFS_500.14"], "what": "Defender for Storage enabled" },
+    { "ref": "defender-key-vault", "id": "0e6763cc-5078-4e64-889d-ff4d9a839047", "effect": "AuditIfNotExists", "groups": ["NYDFS_500.14"], "what": "Defender for Key Vault enabled" },
+    { "ref": "defender-resource-manager", "id": "c3d20c29-b36d-48fe-808b-99a87530ad99", "effect": "AuditIfNotExists", "groups": ["NYDFS_500.14"], "what": "Defender for Resource Manager enabled" },
+    { "ref": "defender-apis", "id": "7926a6d1-b268-4586-8197-e8ae90c877d7", "groups": ["NYDFS_500.14"], "what": "Defender for APIs enabled (the AI gateway)" },
+    { "ref": "storage-secure-transfer", "id": "404c3081-a854-4457-ae30-26a93ef643f9", "effect": "Audit", "groups": ["NYDFS_500.15"], "what": "Secure transfer to storage accounts" },
+    { "ref": "apim-encrypted-protocols", "id": "ee7495e7-3ba7-40b6-bfee-c29e22cc75d4", "groups": ["NYDFS_500.15"], "what": "API Management uses encrypted protocols only" },
+    { "ref": "ai-services-cmk", "id": "67121cc7-ff39-4ab8-b7e3-95b84dab487d", "effect": "Audit", "groups": ["NYDFS_500.15"], "what": "Azure AI services encrypted with a customer-managed key (known gap)" },
+    { "ref": "storage-cmk", "id": "6fac406b-40ca-413b-bf8e-0bf964659c25", "effect": "Audit", "groups": ["NYDFS_500.15"], "what": "Storage encrypted with a customer-managed key (known gap)" },
+    { "ref": "key-vault-purge-protection", "id": "0b60c0b2-2dc2-4e1c-b5c9-abbed971de53", "effect": "Audit", "groups": ["NYDFS_500.16"], "what": "Key Vault purge protection (keys recoverable after deletion)" },
+    { "ref": "high-severity-alert-email", "id": "6e2593d9-add6-4083-9c9b-4b7d2188c899", "effect": "AuditIfNotExists", "groups": ["NYDFS_500.16"], "what": "Email notification for high severity alerts" },
+    { "ref": "security-contact", "id": "4f4f78b8-e367-4b10-a341-d9a4ad5cf1c7", "effect": "AuditIfNotExists", "groups": ["NYDFS_500.16"], "what": "Subscription has a security contact email" }
+  ]
+}

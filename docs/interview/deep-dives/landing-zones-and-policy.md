@@ -4,7 +4,9 @@ How Chatham's central Platform Engineering team (P&T) likely organises Azure, ho
 subscription gets created, and how Azure Policy enforces the rules. Related:
 [ADR 0002](../../adr/0002-work-inside-platform-engineering-guardrails.md),
 [architecture overview, section 1](../../architecture/overview.md),
-[policy/README.md](../../../policy/README.md) and `terraform/modules/policy-guardrails`.
+[policy/README.md](../../../policy/README.md) and `terraform/modules/policy-guardrails`. Which compliance
+standards Defender for Cloud would score on top of these rules, and how the rules map to their controls:
+[compliance-standards.md](../../architecture/compliance-standards.md).
 
 ## Plain words first
 

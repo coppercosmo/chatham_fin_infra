@@ -48,6 +48,20 @@ module "guardrails" {
 }
 ```
 
+## Custom compliance standards: `policy/standards/`
+
+Frameworks with no built-in Defender for Cloud standard, written as sections plus the built-in audit checks
+that evidence them. `terraform/modules/compliance-standards` turns each file into an initiative with control
+groups and `metadata.ASC = "true"`, so Defender shows it as a standard, and assigns it report-only at the
+AI Advisory MG next to the built-in standards (ADR 0016).
+
+| File | What |
+|---|---|
+| `standards/nydfs-part-500.json` | NYDFS 23 NYCRR Part 500, technical subset: 18 built-in checks across sections 500.3, .5, .6, .7, .14, .15 and .16. Our mapping, configuration only |
+
+These files are not guardrails: the guardrails module reads only `policy/*.json`. Background, the full list of
+standards and how our rules map to their controls: [compliance-standards.md](../docs/architecture/compliance-standards.md).
+
 Offline tests: `cd terraform/modules/policy-guardrails && terraform test`. Plain-words background on
 management groups, vending and policy effects: [landing-zones-and-policy.md](../docs/interview/deep-dives/landing-zones-and-policy.md).
 

@@ -45,6 +45,13 @@ engineering time** (elapsed time depends on P&T vending and AOAI quota).
 - [ ] Make sure `model_deployments` has the embedding deployment (`embeddings` by default)
 - [ ] AKS clients: apply `kubernetes/ingest-cronjob.yaml` with the values from `terraform output ingestion`
 
+## 1g. Compliance standards (ADR 0016)
+- [ ] Does the contract or the client's regulator name a standard beyond SOC 2, ISO 27001 and NIST 800-53
+      (inherited from the AI Advisory MG)? For example DORA (EU), NIST CSF 2.0 (US banks), UK OFFICIAL or NCSC CAF
+- [ ] If yes, add it to `scoped_standards` in P&T's `compliance-standards` config: the client's subscription
+      (Tier 1) or its resource group in the cell (Tier 2), in the same pull request as the onboarding
+- [ ] Decide with the client whether Defender may keep suspicious prompt evidence in AI alerts (default off)
+
 ## 2. Request quota
 - [ ] Azure OpenAI quota for each model in `terraform.tfvars` in the target region and SKU
 - [ ] Note any data-residency or abuse-monitoring requirements from the client contract
