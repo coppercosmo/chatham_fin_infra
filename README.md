@@ -16,7 +16,9 @@ networking), not around it.
 
 **All three tier diagrams side by side:** [docs/architecture/tiers-side-by-side.md](docs/architecture/tiers-side-by-side.md),
 with each tier's cost, isolation boundary and trade-off under its diagram, plus
-[one wide image](docs/architecture/diagram/tiers-side-by-side.png) for screen sharing.
+[one wide image](docs/architecture/diagram/tiers-side-by-side.png) for screen sharing, which you can also
+[open in diagrams.net](https://app.diagrams.net/#Uhttps%3A%2F%2Fraw.githubusercontent.com%2Fcoppercosmo%2Fchatham_fin_infra%2Fmain%2Fdocs%2Farchitecture%2Fdiagram%2Ftiers-side-by-side.drawio)
+(editable, each tier on its own layer).
 
 ```mermaid
 flowchart LR

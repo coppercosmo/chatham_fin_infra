@@ -36,7 +36,7 @@ To change it in code, edit [diagram/generate.py](diagram/generate.py) and regene
 python3 docs/architecture/diagram/generate.py         # Tier 1 solution architecture
 python3 docs/architecture/diagram/generate_tiers.py   # Tier 2 and Tier 3 diagrams
 python3 docs/architecture/diagram/generate_ai_flow.py # AI request flow (RAG)
-python3 docs/architecture/diagram/generate_side_by_side.py  # the three tiers in one image; run after the first two
+python3 docs/architecture/diagram/generate_side_by_side.py  # the three tiers in one diagram (SVG + draw.io); run after the first two
 NODE_PATH=$(npm root -g) node docs/architecture/diagram/render-png.mjs solution-architecture tier2-shared-cell tier3-pooled ai-request-flow tiers-side-by-side   # PNGs, needs Playwright
 ```
 
