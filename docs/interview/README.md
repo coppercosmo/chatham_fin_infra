@@ -9,7 +9,8 @@ something real.
 1. [Topic map](topic-map.md): every topic from the recruiter notes, where it lives in the repo, and the
    30-second answer. Read first, then use it as a checklist.
 2. [Isolation tiers](../architecture/isolation-tiers.md): the cost question everyone asks about
-   subscription-per-client, and the two cheaper designs.
+   subscription-per-client, and the two cheaper designs. [All three diagrams side by side](../architecture/tiers-side-by-side.md)
+   is the page to screen-share when you walk through the trade-off.
 3. Deep dives ([index](deep-dives/README.md)):
    [the AI layer end to end (RAG)](deep-dives/ai-architecture.md), with a
    [request-flow diagram](../architecture/diagram/ai-request-flow.svg),

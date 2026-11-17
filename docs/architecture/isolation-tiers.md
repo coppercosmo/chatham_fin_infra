@@ -1,7 +1,8 @@
 # Isolation tiers: three ways to host a client, from most to least isolated
 
 Decision record: [ADR 0014](../adr/0014-isolation-tiers.md) (proposed). This page explains the design in
-plain words, with diagrams, the cost math and the questions an interviewer is likely to ask.
+plain words, with diagrams, the cost math and the questions an interviewer is likely to ask. To see the
+three tiers' diagrams next to each other, open [tiers-side-by-side.md](tiers-side-by-side.md).
 
 ## The idea in one paragraph
 

@@ -3,6 +3,7 @@
 This page describes Tier 1, the dedicated subscription-per-client stamp. The two cheaper tiers (a
 shared cell and a pooled app) are in [isolation-tiers.md](isolation-tiers.md), with their own diagrams
 ([tier2-shared-cell.svg](diagram/tier2-shared-cell.svg), [tier3-pooled.svg](diagram/tier3-pooled.svg)).
+All three tiers' diagrams are next to each other in [tiers-side-by-side.md](tiers-side-by-side.md).
 
 The full multi-client diagram, with every component for three example clients, is
 [diagram/solution-architecture.svg](diagram/solution-architecture.svg) (PNG:
@@ -35,7 +36,8 @@ To change it in code, edit [diagram/generate.py](diagram/generate.py) and regene
 python3 docs/architecture/diagram/generate.py         # Tier 1 solution architecture
 python3 docs/architecture/diagram/generate_tiers.py   # Tier 2 and Tier 3 diagrams
 python3 docs/architecture/diagram/generate_ai_flow.py # AI request flow (RAG)
-NODE_PATH=$(npm root -g) node docs/architecture/diagram/render-png.mjs solution-architecture tier2-shared-cell tier3-pooled ai-request-flow   # PNGs, needs Playwright
+python3 docs/architecture/diagram/generate_side_by_side.py  # the three tiers in one image; run after the first two
+NODE_PATH=$(npm root -g) node docs/architecture/diagram/render-png.mjs solution-architecture tier2-shared-cell tier3-pooled ai-request-flow tiers-side-by-side   # PNGs, needs Playwright
 ```
 
 All three generators share the drawing helpers, palette and Azure icons in [diagram/drawlib.py](diagram/drawlib.py).
