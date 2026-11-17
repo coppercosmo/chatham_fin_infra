@@ -1,19 +1,25 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="3890" height="1260" viewBox="0 0 7780 2520">
+<svg xmlns="http://www.w3.org/2000/svg" width="4290" height="1544" viewBox="0 0 8580 3088">
 <defs>
-<marker id="spectrum" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#5b6675"/></marker>
+<marker id="ah-1f8a68" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f8a68"/></marker>
+<marker id="ah-3b74c4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#3b74c4"/></marker>
+<marker id="ah-6b5ca5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b5ca5"/></marker>
+<marker id="ah-8a94a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8a94a3"/></marker>
+<marker id="ah-b7791f" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b7791f"/></marker>
+<marker id="ah-c0392b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c0392b"/></marker>
 </defs>
 <rect width="100%" height="100%" fill="#ffffff"/>
-<text x="60" y="110" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="72" font-weight="700" fill="#1b2430" text-anchor="start">Three isolation tiers, side by side (ADR 0014)</text>
-<text x="60" y="172" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="34" font-weight="400" fill="#5b6675" text-anchor="start">Read left to right: each tier shares more of the expensive, stateless parts (front door, AI gateway, compute, search units) and keeps the cheap parts that hold data per client. Azure OpenAI tokens cost the same in every tier.</text>
-<line x1="70" y1="248" x2="7710" y2="248" stroke="#5b6675" stroke-width="4" marker-start="url(#spectrum)" marker-end="url(#spectrum)"/>
-<text x="120" y="234" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="30" font-weight="600" fill="#5b6675" text-anchor="start">More isolated, more expensive</text>
-<text x="7660" y="234" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="30" font-weight="600" fill="#5b6675" text-anchor="end">More shared, cheaper</text>
-<rect x="60" y="290" width="2500" height="300" rx="18" fill="#f7f8fa" stroke="#7a8594" stroke-width="3"/>
-<text x="100" y="372" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="60" font-weight="700" fill="#1b2430" text-anchor="start">Tier 1: Dedicated (default)</text>
-<text x="100" y="430" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="36" font-weight="600" fill="#1b2430" text-anchor="start">A private copy of everything, in the client&#x27;s own subscription</text>
-<text x="100" y="490" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="32" font-weight="400" fill="#1b2430" text-anchor="start">~USD 1,500 per client a month  ·  up to highly confidential data  ·  blast radius: 1 client</text>
-<text x="100" y="540" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="32" font-weight="400" fill="#5b6675" text-anchor="start">Boundary: the client&#x27;s own subscription. Shared: only P&amp;T&#x27;s hub. Terraform: stamps/client</text>
-<svg x="60" y="630" width="2500" height="1779" viewBox="0 0 3300 2348">
+<text x="60" y="110" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="72" font-weight="700" text-anchor="start" fill="#1b2430">Three isolation tiers, side by side (ADR 0014)</text>
+<text x="60" y="172" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="34" font-weight="400" text-anchor="start" fill="#5b6675">Read left to right: each tier shares more of the expensive, stateless parts (front door, AI gateway, compute, search units) and keeps the cheap parts that hold data per client. Azure OpenAI tokens cost the same in every tier.</text>
+<path d="M 4290 248 L 70 248" fill="none" stroke="#8a94a3" stroke-width="4" marker-end="url(#ah-8a94a3)" stroke-linejoin="round"/>
+<path d="M 4290 248 L 8510 248" fill="none" stroke="#8a94a3" stroke-width="4" marker-end="url(#ah-8a94a3)" stroke-linejoin="round"/>
+<text x="120" y="234" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="30" font-weight="600" text-anchor="start" fill="#5b6675">More isolated, more expensive</text>
+<text x="8460" y="234" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="30" font-weight="600" text-anchor="end" fill="#5b6675">More shared, cheaper</text>
+<rect x="60" y="290" width="3300" height="300" rx="18" fill="#f7f8fa" stroke="#7a8594" stroke-width="3" opacity="1"/>
+<text x="100" y="372" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="60" font-weight="700" text-anchor="start" fill="#1b2430">Tier 1: Dedicated (default)</text>
+<text x="100" y="430" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="36" font-weight="600" text-anchor="start" fill="#1b2430">A private copy of everything, in the client&#x27;s own subscription</text>
+<text x="100" y="490" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="32" font-weight="400" text-anchor="start" fill="#1b2430">~USD 1,500 per client a month  ·  up to highly confidential data  ·  blast radius: 1 client</text>
+<text x="100" y="540" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="32" font-weight="400" text-anchor="start" fill="#5b6675">Boundary: the client&#x27;s own subscription. Shared: only P&amp;T&#x27;s hub. Terraform: stamps/client</text>
+<svg x="60" y="630" width="3300" height="2348" viewBox="0 0 3300 2348">
 <defs>
 <marker id="t1-ah-1f8a68" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f8a68"/></marker>
 <marker id="t1-ah-3b74c4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#3b74c4"/></marker>
@@ -728,13 +734,14 @@
 <text x="1612" y="2302.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="middle" fill="#ffffff">5</text>
 <text x="1630" y="2303" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#1b2430">Private Link path: client&#x27;s own Azure VNet -&gt; private endpoint -&gt; App Gateway Private Link (no hub routing)</text>
 <text x="50" y="2313" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">Sources: docs/adr/0001-0013, terraform/stamps/client, terraform/modules/hub-connectivity, terraform/platform, terraform/clients/*. Addresses and names are the example configs; every value comes from a client&#x27;s ~40-line tfvars.</text>
-</svg><rect x="60" y="630" width="2500" height="1779" fill="none" stroke="#c3cad4" stroke-width="3"/>
-<rect x="2640" y="290" width="2500" height="300" rx="18" fill="#f7f8fa" stroke="#7a8594" stroke-width="3"/>
-<text x="2680" y="372" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="60" font-weight="700" fill="#1b2430" text-anchor="start">Tier 2: Shared cell</text>
-<text x="2680" y="430" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="36" font-weight="600" fill="#1b2430" text-anchor="start">Shared front door, compute and AI gateway; data, keys and models stay per client</text>
-<text x="2680" y="490" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="32" font-weight="400" fill="#1b2430" text-anchor="start">~USD 170 per client a month at 20 per cell  ·  up to confidential data  ·  blast radius: 20 clients</text>
-<text x="2680" y="540" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="32" font-weight="400" fill="#5b6675" text-anchor="start">Boundary: own resource group, keys off, roles only for the client&#x27;s identities. Terraform: stamps/cell</text>
-<svg x="2640" y="630" width="2500" height="1482" viewBox="0 0 2500 1482">
+</svg>
+<rect x="60" y="630" width="3300" height="2348" rx="0" fill="none" stroke="#c3cad4" stroke-width="3" opacity="1"/>
+<rect x="3440" y="290" width="2500" height="300" rx="18" fill="#f7f8fa" stroke="#7a8594" stroke-width="3" opacity="1"/>
+<text x="3480" y="372" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="60" font-weight="700" text-anchor="start" fill="#1b2430">Tier 2: Shared cell</text>
+<text x="3480" y="430" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="36" font-weight="600" text-anchor="start" fill="#1b2430">Shared front door, compute and AI gateway; data, keys and models stay per client</text>
+<text x="3480" y="490" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="32" font-weight="400" text-anchor="start" fill="#1b2430">~USD 170 per client a month at 20 per cell  ·  up to confidential data  ·  blast radius: 20 clients</text>
+<text x="3480" y="540" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="32" font-weight="400" text-anchor="start" fill="#5b6675">Boundary: own resource group, keys off, roles only for the client&#x27;s identities. Terraform: stamps/cell</text>
+<svg x="3440" y="630" width="2500" height="1482" viewBox="0 0 2500 1482">
 <defs>
 <marker id="t2-ah-1f8a68" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f8a68"/></marker>
 <marker id="t2-ah-3b74c4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#3b74c4"/></marker>
@@ -1013,13 +1020,14 @@
 <text x="62" y="1431.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="middle" fill="#ffffff">5</text>
 <text x="80" y="1432" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#1b2430">Private Link: client&#x27;s own Azure VNet -&gt; private endpoint -&gt; cell App Gateway Private Link</text>
 <text x="50" y="1448" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">Sources: docs/adr/0014-isolation-tiers.md, docs/architecture/isolation-tiers.md, terraform/stamps/cell, terraform/stamps/cell-client. Names and addresses are the example configs.</text>
-</svg><rect x="2640" y="630" width="2500" height="1482" fill="none" stroke="#c3cad4" stroke-width="3"/>
-<rect x="5220" y="290" width="2500" height="300" rx="18" fill="#f7f8fa" stroke="#7a8594" stroke-width="3"/>
-<text x="5260" y="372" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="60" font-weight="700" fill="#1b2430" text-anchor="start">Tier 3: Pooled</text>
-<text x="5260" y="430" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="36" font-weight="600" fill="#1b2430" text-anchor="start">One app for many tenants; Azure checks the signed-in user&#x27;s own token on every data call</text>
-<text x="5260" y="490" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="32" font-weight="400" fill="#1b2430" text-anchor="start">~USD 45 per tenant a month at 45 per pool  ·  public and internal data only  ·  blast radius: 45 tenants</text>
-<text x="5260" y="540" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="32" font-weight="400" fill="#5b6675" text-anchor="start">Boundary: the user&#x27;s token; the app itself has no data role. Terraform: stamps/pool</text>
-<svg x="5220" y="630" width="2500" height="1340" viewBox="0 0 2500 1340">
+</svg>
+<rect x="3440" y="630" width="2500" height="1482" rx="0" fill="none" stroke="#c3cad4" stroke-width="3" opacity="1"/>
+<rect x="6020" y="290" width="2500" height="300" rx="18" fill="#f7f8fa" stroke="#7a8594" stroke-width="3" opacity="1"/>
+<text x="6060" y="372" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="60" font-weight="700" text-anchor="start" fill="#1b2430">Tier 3: Pooled</text>
+<text x="6060" y="430" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="36" font-weight="600" text-anchor="start" fill="#1b2430">One app for many tenants; Azure checks the signed-in user&#x27;s own token on every data call</text>
+<text x="6060" y="490" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="32" font-weight="400" text-anchor="start" fill="#1b2430">~USD 45 per tenant a month at 45 per pool  ·  public and internal data only  ·  blast radius: 45 tenants</text>
+<text x="6060" y="540" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="32" font-weight="400" text-anchor="start" fill="#5b6675">Boundary: the user&#x27;s token; the app itself has no data role. Terraform: stamps/pool</text>
+<svg x="6020" y="630" width="2500" height="1340" viewBox="0 0 2500 1340">
 <defs>
 <marker id="t3-ah-1f8a68" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f8a68"/></marker>
 <marker id="t3-ah-3b74c4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#3b74c4"/></marker>
@@ -1226,6 +1234,7 @@
 <text x="62" y="1289.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" text-anchor="middle" fill="#ffffff">5</text>
 <text x="80" y="1290" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#1b2430">Egress: pool workload subnets -&gt; hub firewall (UDR)</text>
 <text x="50" y="1306" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#5b6675">Sources: docs/adr/0014-isolation-tiers.md, docs/architecture/isolation-tiers.md, terraform/stamps/pool. Names are the example config.</text>
-</svg><rect x="5220" y="630" width="2500" height="1340" fill="none" stroke="#c3cad4" stroke-width="3"/>
-<text x="60" y="2470" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="28" font-weight="400" fill="#5b6675" text-anchor="start">Fixed costs are approximate US list prices (USD/month), with Standard v2 API Management, to show the shape of the saving. Details, cost math and the trade-offs of each tier: docs/architecture/isolation-tiers.md. Generated by generate_side_by_side.py from the three tier diagrams.</text>
+</svg>
+<rect x="6020" y="630" width="2500" height="1340" rx="0" fill="none" stroke="#c3cad4" stroke-width="3" opacity="1"/>
+<text x="60" y="3038" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="28" font-weight="400" text-anchor="start" fill="#5b6675">Fixed costs are approximate US list prices (USD/month), with Standard v2 API Management, to show the shape of the saving. Details, cost math and the trade-offs of each tier: docs/architecture/isolation-tiers.md. Generated by generate_side_by_side.py from the three tier diagrams.</text>
 </svg>

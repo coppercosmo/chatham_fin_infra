@@ -77,12 +77,19 @@ Costs are approximate US list prices with Standard v2 API Management, to show th
 Azure OpenAI tokens are left out because they cost the same per token in every tier. Check the Azure
 pricing calculator before quoting them.
 
-## One image for screen sharing
+## One diagram for screen sharing, also in draw.io
 
 [diagram/tiers-side-by-side.png](diagram/tiers-side-by-side.png) puts the three diagrams in one wide
-picture, at the same width, with each tier's cost, data allowed, blast radius and boundary above it.
+picture, each at its own size, with each tier's cost, data allowed, blast radius and boundary above it.
 Open it and zoom in, or share it full screen when you walk through the trade-off.
 SVG: [diagram/tiers-side-by-side.svg](diagram/tiers-side-by-side.svg).
+
+**Open it in draw.io:** [open in diagrams.net](https://app.diagrams.net/#Uhttps%3A%2F%2Fraw.githubusercontent.com%2Fcoppercosmo%2Fchatham_fin_infra%2Fmain%2Fdocs%2Farchitecture%2Fdiagram%2Ftiers-side-by-side.drawio)
+(an editable copy; use File > Save as to keep your changes), or
+[open from GitHub](https://app.diagrams.net/#Hcoppercosmo%2Fchatham_fin_infra%2Fmain%2Fdocs%2Farchitecture%2Fdiagram%2Ftiers-side-by-side.drawio)
+to save edits back to the repo. It's one page with every box as its own shape, and each tier is on its
+own layer, so you can hide two tiers and talk through one (View > Layers). The native file is
+[diagram/tiers-side-by-side.drawio](diagram/tiers-side-by-side.drawio).
 
 ## Related
 
