@@ -178,6 +178,44 @@ variable "search_replica_count" {
   description = "3 meets the AI Search read/write SLA. Use 1 for internal or non-production clients."
 }
 
+# ---------- Document ingestion and content filtering (ADR 0015)
+variable "ingestion" {
+  description = <<-EOT
+    How documents get into this client's search index. null = not managed by this stamp. Needs enable_search.
+
+    mode = "push" (default, same design as Tiers 2 and 3): a scheduled job (modules/ingestion-job; a CronJob on
+      AKS) runs as its own identity, reads the documents container, chunks, embeds through the AI gateway and
+      writes to this client's index. The app keeps read-only access to the index.
+    mode = "pull": AI Search's own indexer and skillset do the work, reaching private storage and the model
+      account through two shared private links. Each link must be approved on its target after apply
+      (scripts/approve-shared-private-links.sh, run by the apply workflow). The job then only applies the indexer
+      definitions and starts runs. Embedding calls go from Search straight to the model, not through the gateway.
+  EOT
+  type = object({
+    image                = string
+    mode                 = optional(string, "push")
+    schedule             = optional(string, "0 2 * * *")
+    storage_container    = optional(string, "documents")
+    embedding_deployment = optional(string, "embeddings")
+  })
+  default = null
+
+  validation {
+    condition     = var.ingestion == null || contains(["push", "pull"], try(var.ingestion.mode, ""))
+    error_message = "ingestion.mode must be push or pull."
+  }
+}
+
+variable "content_filter" {
+  description = "Content filter for every model deployment (modules/ai-services). Defaults: Microsoft's thresholds plus indirect attack detection."
+  type = object({
+    name                      = optional(string, "rag-default")
+    severity_threshold        = optional(string, "Medium")
+    indirect_attack_detection = optional(bool, true)
+  })
+  default = {}
+}
+
 # ---------- Compute (ADR 0005, 0011)
 variable "compute_platform" {
   type        = string

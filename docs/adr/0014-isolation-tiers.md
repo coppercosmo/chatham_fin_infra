@@ -1,6 +1,6 @@
 # ADR 0014: Isolation tiers (dedicated, shared cell, pooled)
 
-- Status: Proposed, amends 0001 (and, for Tiers 2 and 3 only, 0006 and 0012)
+- Status: Proposed, amends 0001 (and, for Tiers 2 and 3 only, 0006 and 0012); ingestion amended by 0015
 - Date: 2026-11-16
 - Plain-words version with diagrams and cost math: [isolation-tiers.md](../architecture/isolation-tiers.md)
 
@@ -52,7 +52,7 @@ Three tiers, built from the same modules and running **the same application imag
 | Terraform root | `stamps/client` | `stamps/cell` + `stamps/cell-client` | `stamps/pool` |
 | Boundary | Subscription | Resource group + identities, inside a cell subscription (≤ 20 clients) | Sub-resources + token claim, inside a pool subscription (≤ 45 tenants) |
 | Shared | Nothing (P&T hub only) | VNet, App Gateway, Container Apps environment, APIM, search service, TLS vault | Everything except the per-tenant pieces |
-| Dedicated | Everything | Storage, Key Vault, search **index**, Azure OpenAI account, Log Analytics, App Insights, app and gateway identities, deployment identity, budget | Blob container + encryption scope, search index, Entra group, ingestion job identity, token limit |
+| Dedicated | Everything | Storage, Key Vault, search **index**, Azure OpenAI account, Log Analytics, App Insights, app, gateway and ingestion identities, deployment identity, budget | Blob container + encryption scope, search index, Entra group, ingestion job identity, token limit |
 | Data classification allowed | Up to highly confidential | Up to confidential | Public and internal only (validated in Terraform) |
 | Cost before tokens | ~1,500 (~3,600 with Premium APIM) | ~170 at 20 clients (~280 with Premium APIM) | ~45 at 45 tenants (~90 with Premium APIM) |
 | Onboarding | Days to weeks elapsed (vending, peering, quota) | Hours: three pull requests, no vending | Same day: a map entry and a P&T group |
@@ -63,9 +63,10 @@ Three tiers, built from the same modules and running **the same application imag
    (ADR 0004), so the only way in is a token for an identity with a role on that resource.
 2. **Per-client identities.** `id-<client>-app` has data roles on that client's storage, vault and
    index only. `id-<client>-gw` has `Cognitive Services OpenAI User` on that client's Azure OpenAI
-   account only. Both live in the client's resource group.
+   account only. `id-<client>-ingest` (ADR 0015) reads that client's documents and writes its index.
+   All three live in the client's resource group.
 3. **Shared APIM, per-client API.** Each client's API validates that the caller is that client's app
-   identity (`client-application-ids`) and calls Azure OpenAI with
+   or ingestion identity (`client-application-ids`) and calls Azure OpenAI with
    `authentication-managed-identity client-id="<that client's gateway identity>"`. APIM holds every
    gateway identity, but each API can only use its own; the rendered policies are asserted in tests.
 4. **Shared App Gateway, per-client site.** One listener, certificate and WAF policy per host name;
@@ -74,11 +75,13 @@ Three tiers, built from the same modules and running **the same application imag
    and accepts ingress only from the App Gateway subnet, so apps can't call each other.
 6. **Per-client deployment identity.** The cell creates each client's resource group (`client_slots`)
    and gives that client's pipeline identity Contributor there, an RBAC Administrator role limited by
-   condition to the six roles `cell-client` assigns, a locks-only custom role, and a join-only custom
+   condition to the seven roles `cell-client` assigns, a locks-only custom role, and a join-only custom
    role on the cell's endpoint subnet (and DNS zones when standalone). It has no rights on the cell's
    shared resources or on another client's resource group.
-7. **Cell deployment identity holds no data roles.** The only data role the cell grants is a client's
-   app identity on that client's own search index.
+7. **Cell deployment identity holds no data roles.** The only data roles the cell grants are on a
+   client's own search index: write for that client's ingestion identity and read for its app (or
+   write for the app, if the client has no ingestion job). The cell's index admin identity manages
+   index definitions but can't read documents (ADR 0015).
 8. **Capacity.** Azure OpenAI quota is per subscription and region, so a cell's clients draw from one
    regional quota at deployment time. Capacity assigned to a deployment is a hard partition at run
    time, so one client can't use another's. PTU is Tier 1 only (validated).

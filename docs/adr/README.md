@@ -19,3 +19,4 @@ consequences, alternatives. A decision can be superseded by a later ADR; it is n
 | [0012](0012-ai-gateway-api-management.md) | AI gateway (API Management) between client apps and models | Accepted, piloting |
 | [0013](0013-client-network-connectivity.md) | Client network connectivity: Private Link first, then ExpressRoute or VPN through the hub | Accepted, amends 0010 |
 | [0014](0014-isolation-tiers.md) | Isolation tiers: dedicated, shared cell, pooled | Proposed, amends 0001 |
+| [0015](0015-document-ingestion.md) | Document ingestion: one push job per client in every tier, a content filter for RAG | Proposed, amends 0006 |

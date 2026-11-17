@@ -1,6 +1,6 @@
 # ADR 0006: Dedicated Azure OpenAI / AI Foundry per client, data-zone deployments
 
-- Status: Accepted
+- Status: Accepted, amended by 0015 (content filtering)
 - Date: 2026-11-13
 
 ## Decision
@@ -13,7 +13,9 @@
     data zone. `GlobalStandard` is opt-in per client; regional `Standard` or provisioned
     throughput is used when a client contract requires single-region processing or guaranteed capacity.
 - Optional **Azure AI Search** per client for RAG, private, keyless, `disableLocalAuth`.
-- Content filtering stays at Microsoft defaults; any change goes through an ADR with the client.
+- Content filtering: Microsoft's defaults, written down in Terraform as `rag-default` on every
+  deployment, plus indirect attack detection for RAG (ADR 0015). Stricter settings per client through
+  config; anything looser goes through an ADR with the client.
 - Abuse-monitoring opt-out (no human review of prompts) is applied for per Microsoft's
   modified-access process where a client requires it; this is tracked per client in config/notes.
 

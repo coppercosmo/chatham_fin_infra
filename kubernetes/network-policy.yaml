@@ -36,3 +36,29 @@ spec:
         - ipBlock: { cidr: 0.0.0.0/0 }
       ports:
         - { port: 443, protocol: TCP }
+---
+# Ingestion CronJob (ADR 0015): nothing may call it; it calls DNS and, on 443, storage, Search and the AI gateway
+# through private endpoints (the hub firewall allow-lists FQDNs).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: advisor-ingest
+  namespace: advisor
+spec:
+  podSelector:
+    matchLabels: { app: advisor-ingest }
+  policyTypes: [Ingress, Egress]
+  ingress: []
+  egress:
+    - to: # cluster DNS
+        - namespaceSelector:
+            matchLabels: { kubernetes.io/metadata.name: kube-system }
+          podSelector:
+            matchLabels: { k8s-app: kube-dns }
+      ports:
+        - { port: 53, protocol: UDP }
+        - { port: 53, protocol: TCP }
+    - to:
+        - ipBlock: { cidr: 0.0.0.0/0 }
+      ports:
+        - { port: 443, protocol: TCP }

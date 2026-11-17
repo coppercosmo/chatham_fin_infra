@@ -88,6 +88,12 @@ variable "enable_private_link" {
   description = "Private Link on the shared App Gateway, for clients that connect from their own Azure subscription."
 }
 
+variable "ingest_image" {
+  type        = string
+  default     = null
+  description = "Ingestion image (ADR 0015), pinned by digest. Set it to run each client's ingestion job and the cell's index admin job."
+}
+
 variable "acr" {
   type = object({
     id           = string
@@ -170,6 +176,12 @@ variable "clients" {
     key_vault_uri                  = string
     storage_blob_url               = string
     app_insights_connection_string = string
+
+    # Document ingestion (ADR 0015), from cell_registration. Without them the client's app loads its own index.
+    ingest_identity_id           = optional(string)
+    ingest_identity_client_id    = optional(string)
+    ingest_identity_principal_id = optional(string)
+    ingest_schedule              = optional(string, "0 2 * * *")
   }))
   default = {}
 

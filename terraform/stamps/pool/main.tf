@@ -223,62 +223,66 @@ resource "azurerm_role_assignment" "ingest_acr" {
   principal_type       = "ServicePrincipal"
 }
 
-resource "azurerm_container_app_job" "ingest" {
-  for_each                     = var.tenants
-  name                         = "job-${each.key}-ingest"
-  location                     = var.location
+# The same ingestion job design as Tiers 1 and 2 (modules/ingestion-job, ADR 0015). Each tenant's job runs as that
+# tenant's identity, reads its container and writes its index; embeddings go through the pool's gateway, which maps
+# the job's identity to its tenant for limits and metering.
+module "ingestion" {
+  source                       = "../../modules/ingestion-job"
   resource_group_name          = azurerm_resource_group.this.name
+  location                     = var.location
+  tags                         = local.tags
   container_app_environment_id = module.apps.environment_id
-  replica_timeout_in_seconds   = 3600
-  workload_profile_name        = "Consumption"
-  tags                         = merge(local.tags, { tenant = each.key })
+  image                        = var.ingest_image
+  registry_server              = var.acr == null ? null : var.acr.login_server
 
-  identity {
-    type         = "UserAssigned"
-    identity_ids = [azurerm_user_assigned_identity.ingest[each.key].id]
-  }
-
-  dynamic "registry" {
-    for_each = var.acr == null ? [] : [1]
-    content {
-      server   = var.acr.login_server
-      identity = azurerm_user_assigned_identity.ingest[each.key].id
+  jobs = {
+    for k, t in var.tenants : k => {
+      identity_id        = azurerm_user_assigned_identity.ingest[k].id
+      identity_client_id = azurerm_user_assigned_identity.ingest[k].client_id
+      storage_blob_url   = module.storage.blob_endpoint
+      storage_container  = k # a container per tenant
+      search_endpoint    = module.ai.search_endpoint
+      search_index       = k
+      openai_endpoint    = module.ai_gateway.gateway_url
+      schedule           = t.ingest_schedule
     }
   }
 
-  schedule_trigger_config {
-    cron_expression = each.value.ingest_schedule
+  # Index definitions on the shared service belong to the pool, not to any tenant identity.
+  index_admin = {
+    identity_id        = azurerm_user_assigned_identity.index_admin.id
+    identity_client_id = azurerm_user_assigned_identity.index_admin.client_id
+    search_endpoint    = module.ai.search_endpoint
+    indexes            = keys(var.tenants)
   }
 
-  template {
-    container {
-      name   = "ingest"
-      image  = var.ingest_image
-      cpu    = 0.5
-      memory = "1Gi"
+  depends_on = [azurerm_role_assignment.ingest_blob, azurerm_role_assignment.ingest_index, azurerm_role_assignment.index_admin]
+}
 
-      env {
-        name  = "AZURE_CLIENT_ID"
-        value = azurerm_user_assigned_identity.ingest[each.key].client_id
-      }
-      env {
-        name  = "TENANT_CODE" # this job's identity can reach only this tenant's container and index anyway
-        value = each.key
-      }
-      env {
-        name  = "AZURE_STORAGE_BLOB_URL"
-        value = module.storage.blob_endpoint
-      }
-      env {
-        name  = "AZURE_SEARCH_ENDPOINT"
-        value = module.ai.search_endpoint
-      }
-      env {
-        name  = "AZURE_OPENAI_ENDPOINT"
-        value = module.ai_gateway.gateway_url
-      }
-    }
-  }
+# The per-tenant jobs used to be declared here; moving them into the shared module keeps every existing job.
+moved {
+  from = azurerm_container_app_job.ingest
+  to   = module.ingestion.azurerm_container_app_job.this
+}
+
+# Search Service Contributor manages index definitions but can't read or load documents. It is service-wide, so
+# it belongs to this platform identity and never to a tenant's.
+resource "azurerm_user_assigned_identity" "index_admin" {
+  name                = "id-${module.naming.base}-index-admin"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.this.name
+  tags                = local.tags
+}
+
+resource "azurerm_role_assignment" "index_admin" {
+  for_each = merge(
+    { search = { scope = module.ai.search_id, role = "Search Service Contributor" } },
+    var.acr == null ? {} : { acr = { scope = var.acr.id, role = "AcrPull" } },
+  )
+  scope                = each.value.scope
+  role_definition_name = each.value.role
+  principal_id         = azurerm_user_assigned_identity.index_admin.principal_id
+  principal_type       = "ServicePrincipal"
 }
 
 # ------------------------------------------------------------------ the pooled app

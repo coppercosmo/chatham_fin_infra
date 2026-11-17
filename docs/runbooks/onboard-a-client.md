@@ -37,6 +37,14 @@ engineering time** (elapsed time depends on P&T vending and AOAI quota).
       circuit ID, and check the ranges against IPAM. Overlap means NAT (VPN) or a unique advertised range (ExpressRoute)
 - [ ] Follow [connect-client-network.md](connect-client-network.md) for the three-step hub handover
 
+## 1f. Documents and ingestion (ADR 0015)
+- [ ] Push (default) or pull? Pull (an AI Search indexer) is Tier 1 only, needs the client's OK that
+      embedding calls skip the AI gateway, and adds two shared private links the pipeline approves
+- [ ] Ingestion image digest for `ingestion.image` (same release as the app, promoted by ring)
+- [ ] Container for documents (default `documents`) and the schedule (default 02:00 UTC, off-peak)
+- [ ] Make sure `model_deployments` has the embedding deployment (`embeddings` by default)
+- [ ] AKS clients: apply `kubernetes/ingest-cronjob.yaml` with the values from `terraform output ingestion`
+
 ## 2. Request quota
 - [ ] Azure OpenAI quota for each model in `terraform.tfvars` in the target region and SKU
 - [ ] Note any data-residency or abuse-monitoring requirements from the client contract
@@ -58,3 +66,11 @@ engineering time** (elapsed time depends on P&T vending and AOAI quota).
 - [ ] App health endpoint returns 200 through P&T ingress
 - [ ] Logs visible in the client workspace; client appears in the central workbook
 - [ ] Budget alert recipients confirmed
+- [ ] Pull mode only: both shared private links show Approved
+      (`az search shared-private-link-resource list --service-name <srch> -g <rg> -o table`); the apply
+      workflow approves them, and any it skipped are listed in its log
+- [ ] First ingestion run: `az containerapp job start -n job-<client>-ingest -g <rg>`, then check the
+      execution succeeded and the index has documents
+- [ ] Cell or pool client: start `job-index-admin` in the cell's or pool's resource group **before** the
+      client's first ingestion run, so its index exists
+- [ ] Ask a question whose answer is in a known document and check the citation

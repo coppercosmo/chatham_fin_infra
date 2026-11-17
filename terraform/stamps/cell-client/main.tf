@@ -132,12 +132,29 @@ module "gateway_identity" {
   }
 }
 
-# The cell's pipeline attaches these identities to the client's app and to the shared gateway.
+# Document ingestion (ADR 0015): the cell runs this client's ingestion job AS this identity. It reads this client's
+# documents only; the cell gives it write on this client's index and admits it at this client's gateway API, so its
+# embedding calls are limited and metered like the app's.
+module "ingest_identity" {
+  source              = "../../modules/workload-identity"
+  name                = "id-${module.naming.base}-ingest"
+  resource_group_name = data.azurerm_resource_group.this.name
+  location            = var.location
+  tags                = local.tags
+
+  role_assignments = merge(
+    { documents = { scope = "${module.storage.id}/blobServices/default/containers/documents", role = "Storage Blob Data Reader" } },
+    var.acr != null ? { acr = { scope = var.acr.id, role = "AcrPull" } } : {},
+  )
+}
+
+# The cell's pipeline attaches these identities to the client's app, its ingestion job and the shared gateway.
 # Managed Identity Operator lets it assign them; it grants no access to anything they can reach.
 resource "azurerm_role_assignment" "cell_attaches_identity" {
   for_each = var.cell.deployer_principal_id == null ? {} : {
     app     = module.app_identity.id
     gateway = module.gateway_identity.id
+    ingest  = module.ingest_identity.id
   }
   scope                = each.value
   role_definition_name = "Managed Identity Operator"

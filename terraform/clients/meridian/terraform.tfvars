@@ -40,6 +40,12 @@ model_deployments = {
   embeddings = { model_name = "text-embedding-3-large", model_version = "1", sku = "DataZoneStandard", capacity = 30 }
 }
 
+# Document ingestion (ADR 0015) on AKS: kubernetes/ingest-cronjob.yaml, running as meridian's ingestion identity
+# through workload identity (service account advisor-ingest), with the settings from `terraform output ingestion`.
+ingestion = {
+  image = "craiadvx7k2.azurecr.io/advisor-ingest@sha256:0000000000000000000000000000000000000000000000000000000000000000"
+}
+
 ai_gateway = {
   sku_name          = "Premium_1"
   tokens_per_minute = 30000

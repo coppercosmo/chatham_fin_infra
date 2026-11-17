@@ -40,6 +40,12 @@ acr = {
 }
 app_image = "craiadvx7k2.azurecr.io/advisor-api@sha256:0000000000000000000000000000000000000000000000000000000000000000"
 
+# Document ingestion (ADR 0015): a nightly job, as its own identity, reads acme's documents container, chunks,
+# embeds through the AI gateway below and writes acme's index. The app only reads the index.
+ingestion = {
+  image = "craiadvx7k2.azurecr.io/advisor-ingest@sha256:0000000000000000000000000000000000000000000000000000000000000000"
+}
+
 # AI gateway (ADR 0012): the app reaches Azure OpenAI only through APIM. Ring 1 pilot client.
 ai_gateway = {
   sku_name              = "Premium_1"

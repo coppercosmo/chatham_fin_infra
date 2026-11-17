@@ -176,7 +176,7 @@ landing-zones deep dive). And the provider needs `storage_use_azuread = true` on
 **D4. How do you let a pipeline create role assignments without letting it make anyone Owner?**
 > Role Based Access Control Administrator with a condition that limits which role definitions it can
 > assign (and optionally to which principal types), at the narrowest scope. The Tier 2 cell does this
-> for each client's pipeline: it can assign only the six data roles its stamp needs, only in its own
+> for each client's pipeline: it can assign only the seven roles its stamp needs, only in its own
 > resource group.
 
 **D5. Key Vault access policies or RBAC?**

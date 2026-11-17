@@ -410,3 +410,120 @@ run "connectivity_type_block_must_match" {
 
   expect_failures = [var.client_connectivity]
 }
+
+# ---------------------------------------------------------------- document ingestion and content filter (ADR 0015)
+
+run "push_ingestion_runs_as_its_own_identity_through_the_gateway" {
+  command = plan
+
+  variables {
+    ai_gateway = {}
+    ingestion  = { image = "craiadvx7k2.azurecr.io/advisor-ingest@sha256:0000" }
+  }
+
+  assert {
+    condition     = length(module.ingestion) == 1 && length(module.ingestion[0].job_names) == 1
+    error_message = "Push mode on Container Apps runs one scheduled job for this client."
+  }
+  assert {
+    condition     = toset(module.ingest_identity[0].role_keys) == toset(["documents", "index", "index_admin"])
+    error_message = "The ingestion identity reads documents and writes this client's index, and nothing else (models only through the gateway)."
+  }
+  assert {
+    condition     = module.ingestion[0].settings["testco"]["INGEST_MODE"] == "push" && module.ingestion[0].settings["testco"]["AZURE_SEARCH_INDEX"] == "testco"
+    error_message = "The job pushes into this client's own index."
+  }
+  assert {
+    condition     = !contains(module.app_identity.role_keys, "index") && contains(module.app_identity.role_keys, "search")
+    error_message = "The app stays read-only on the index; only the ingestion job writes."
+  }
+  assert {
+    condition     = length(azurerm_search_shared_private_link_service.this) == 0 && length(azurerm_role_assignment.search_to_blob) == 0 && length(azurerm_role_assignment.search_to_openai) == 0
+    error_message = "In push mode AI Search's own identity has no data roles and no outbound links."
+  }
+}
+
+run "push_ingestion_without_gateway_calls_the_model_directly" {
+  command = plan
+
+  variables {
+    ingestion = { image = "craiadvx7k2.azurecr.io/advisor-ingest@sha256:0000" }
+  }
+
+  assert {
+    condition     = contains(module.ingest_identity[0].role_keys, "openai")
+    error_message = "Without a gateway the job needs its own least-privilege model role."
+  }
+}
+
+run "pull_ingestion_reaches_private_storage_and_models_through_shared_private_links" {
+  command = plan
+
+  variables {
+    ai_gateway = {}
+    ingestion  = { image = "craiadvx7k2.azurecr.io/advisor-ingest@sha256:0000", mode = "pull" }
+  }
+
+  assert {
+    condition     = toset([for l in azurerm_search_shared_private_link_service.this : l.subresource_name]) == toset(["blob", "openai_account"])
+    error_message = "Pull mode needs one shared private link to blob and one to the model account."
+  }
+  assert {
+    condition     = length(azurerm_role_assignment.search_to_blob) == 1 && length(azurerm_role_assignment.search_to_openai) == 1
+    error_message = "Pull mode gives AI Search's identity read on storage and use of the embedding model."
+  }
+  assert {
+    condition     = toset(module.ingest_identity[0].role_keys) == toset(["index_admin"])
+    error_message = "In pull mode the job only manages the indexer definitions; it reads and writes no data."
+  }
+  assert {
+    condition     = length(output.shared_private_links) == 2
+    error_message = "The links to approve must be an output for the approval step."
+  }
+}
+
+run "ingestion_on_aks_uses_a_cronjob_with_its_own_workload_identity" {
+  command = plan
+
+  variables {
+    compute_platform = "aks"
+    ingestion        = { image = "craiadvx7k2.azurecr.io/advisor-ingest@sha256:0000" }
+  }
+
+  assert {
+    condition     = length(module.ingestion) == 0
+    error_message = "AKS clients run ingestion as a CronJob, not a Container Apps job."
+  }
+  assert {
+    condition     = module.aks[0].workload_identity_subjects["ingest"] == "system:serviceaccount:advisor:advisor-ingest"
+    error_message = "The ingestion identity must trust only the advisor-ingest service account in this cluster."
+  }
+}
+
+run "ingestion_needs_search" {
+  command = plan
+
+  variables {
+    enable_search = false
+    ingestion     = { image = "craiadvx7k2.azurecr.io/advisor-ingest@sha256:0000" }
+  }
+
+  expect_failures = [terraform_data.ingestion_contract]
+}
+
+run "content_filter_blocks_document_attacks_on_every_deployment" {
+  command = plan
+
+  assert {
+    condition     = module.ai.content_filters["Indirect Attack/Prompt"].enabled && module.ai.content_filters["Indirect Attack/Prompt"].blocking
+    error_message = "RAG needs indirect attack detection on: retrieved documents are untrusted input."
+  }
+  assert {
+    condition     = alltrue([for c in ["Hate", "Sexual", "Selfharm", "Violence"] : module.ai.content_filters["${c}/Prompt"].severity == "Medium" && module.ai.content_filters["${c}/Completion"].blocking])
+    error_message = "Harm categories keep Microsoft's default (block Medium and above) on prompts and completions."
+  }
+  assert {
+    condition     = alltrue([for d in values(module.ai.deployment_content_filters) : d == "rag-default"])
+    error_message = "Every model deployment uses the client's content filter."
+  }
+}

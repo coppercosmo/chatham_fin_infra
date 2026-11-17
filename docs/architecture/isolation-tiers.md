@@ -76,7 +76,10 @@ bad change.
    only accepts a token from `id-northwind-app`, and it calls northwind's Azure OpenAI account **as**
    `id-northwind-gw`, which is the only identity with access to that account.
 4. For documents, the app reads northwind's storage, vault and search index directly over private
-   endpoints, as `id-northwind-app`.
+   endpoints, as `id-northwind-app`. The index is filled at night by `job-northwind-ingest`, which runs
+   in the shared environment as northwind's own `id-northwind-ingest`: read on northwind's documents,
+   write on northwind's index, embeddings through northwind's API on the gateway. Once that job
+   exists, the app can only read the index (ADR 0015).
 5. A client already on Azure can reach its site through Private Link instead of the hub.
 
 **Why tailspin can't see northwind's data, even though they share a gateway and an environment.**
@@ -90,7 +93,7 @@ bad change.
 - Each client's pipeline has its own deployment identity, and the cell gives it rights on **that
   client's resource group only** (plus "join" on the shared endpoint subnet). It can't touch the shared
   resources or another client's group, and its RBAC Administrator role is limited by an Azure ABAC
-  condition to the six data roles the client root needs, so it can't hand out Owner.
+  condition to the seven roles the client root needs, so it can't hand out Owner.
 
 **What is weaker than Tier 1 (say this first in an interview).**
 - Network separation is coarser: clients share a VNet, a front-door IP and an endpoint subnet. Access
@@ -110,7 +113,9 @@ bad change.
    client's storage, vault, Azure OpenAI account, workspace and identities, with private endpoints in
    the cell's subnet. Its output `cell_registration` lists identity IDs and endpoints (no secrets).
 3. **Cell PR:** add the client to `clients` with those values plus host name, certificate and limits.
-   The cell adds the App Gateway site, container app, APIM API and search index role.
+   The cell adds the App Gateway site, container app, APIM API, search index roles and ingestion job.
+   Then start `job-index-admin` once (`az containerapp job start`) so the client's index exists before
+   its first ingestion run.
 
 P&T still adds a DNS record and (for routed clients) a firewall rule, from the cell's
 `hub_connectivity_request` output, the same handover as Tier 1.
@@ -163,7 +168,8 @@ That is why Terraform refuses `data_classification = "confidential"` for a pool 
 
 **Onboarding a tenant.** P&T creates the tenant's Entra group and assigns it the `Tenant.<code>` app role;
 we add one entry to `tenants` in `terraform/pools/pool01/terraform.tfvars`. Terraform creates the
-container, encryption scope, index permissions, ingestion identity and job. Pools are capped at 45 tenants
+container, encryption scope, index permissions, ingestion identity and job; then start the pool's
+`job-index-admin` once to create the tenant's index. Pools are capped at 45 tenants
 because AI Search S1 allows 50 indexes per service.
 
 ## Which client gets which tier
