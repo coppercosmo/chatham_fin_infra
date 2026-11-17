@@ -14,6 +14,10 @@ networking), not around it.
 | 2. Shared cell | Front door, compute, AI gateway, search service | Data, keys, model account, logs, identities, in its own resource group | ~170 per client | `stamps/cell` + `stamps/cell-client` |
 | 3. Pooled (internal/public data) | One app and model account | Container, index, encryption scope, group, ingestion identity; the app reads with the user's token | ~45 per tenant | `stamps/pool` |
 
+**All three tier diagrams side by side:** [docs/architecture/tiers-side-by-side.md](docs/architecture/tiers-side-by-side.md),
+with each tier's cost, isolation boundary and trade-off under its diagram, plus
+[one wide image](docs/architecture/diagram/tiers-side-by-side.png) for screen sharing.
+
 ```mermaid
 flowchart LR
   subgraph PT["Platform Engineering (owns guardrails)"]
@@ -69,7 +73,7 @@ Log Analytics + App Insights, budget alerts, and delete locks. Two per-client ch
 | Path | What |
 |---|---|
 | `docs/adr/` | Architecture decisions and trade-offs ([index](docs/adr/README.md)) |
-| `docs/architecture/` | Diagrams: estate, stamp, request path ([overview](docs/architecture/overview.md)); [client network connectivity](docs/architecture/client-connectivity.md); full multi-client, tier and AI request-flow diagrams in `diagram/` |
+| `docs/architecture/` | Diagrams: estate, stamp, request path ([overview](docs/architecture/overview.md)); [the three tier diagrams side by side](docs/architecture/tiers-side-by-side.md); [client network connectivity](docs/architecture/client-connectivity.md); full multi-client, tier and AI request-flow diagrams in `diagram/` |
 | `docs/runbooks/` | Onboard / offboard a client, connect a client's network, incident runbooks |
 | `docs/interview/` | [Study guide](docs/interview/README.md): topic map, deep dives (including [the AI layer end to end](docs/interview/deep-dives/ai-architecture.md)), mock technical test, repo walkthrough, likely questions, 30/60/90 |
 | `terraform/modules/` | Reusable modules: naming, spoke-network, private-endpoint, key-vault, storage, ai-services, ai-gateway, container-apps, ingestion-job, aks, app-gateway, shared-app-gateway, observability, workload-identity, deployment-identity, cidr-overlap, policy-guardrails, and hub-connectivity (the last two proposed to Platform Engineering) |
