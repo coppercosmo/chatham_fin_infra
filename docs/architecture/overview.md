@@ -34,10 +34,11 @@ To change it in code, edit [diagram/generate.py](diagram/generate.py) and regene
 ```bash
 python3 docs/architecture/diagram/generate.py         # Tier 1 solution architecture
 python3 docs/architecture/diagram/generate_tiers.py   # Tier 2 and Tier 3 diagrams
-NODE_PATH=$(npm root -g) node docs/architecture/diagram/render-png.mjs solution-architecture tier2-shared-cell tier3-pooled   # PNGs, needs Playwright
+python3 docs/architecture/diagram/generate_ai_flow.py # AI request flow (RAG)
+NODE_PATH=$(npm root -g) node docs/architecture/diagram/render-png.mjs solution-architecture tier2-shared-cell tier3-pooled ai-request-flow   # PNGs, needs Playwright
 ```
 
-Both generators share the drawing helpers, palette and Azure icons in [diagram/drawlib.py](diagram/drawlib.py).
+All three generators share the drawing helpers, palette and Azure icons in [diagram/drawlib.py](diagram/drawlib.py).
 
 ## 1. Where this sits in Chatham's Azure estate
 
@@ -96,6 +97,11 @@ flowchart TB
 ```
 
 ## 3. Request path (Container Apps)
+
+What the app does between receiving the question and answering it (embed, search the client's index,
+generate through the AI gateway, and how the index gets filled) is drawn step by step in
+[diagram/ai-request-flow.svg](diagram/ai-request-flow.svg) and explained in the
+[AI layer deep dive](../interview/deep-dives/ai-architecture.md).
 
 ```mermaid
 sequenceDiagram
