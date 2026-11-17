@@ -32,3 +32,18 @@ jobs:
           terraform init -input=false -backend-config=../../clients/${{ inputs.client }}/backend.hcl
           terraform plan -input=false -var-file=../../clients/${{ inputs.client }}/terraform.tfvars -out=tfplan
           terraform apply -input=false tfplan
+          terraform output -json shared_private_links > "$RUNNER_TEMP/shared_private_links.json"
+      # Pull-mode ingestion (ADR 0015): AI Search's links to this client's storage and model account stay Pending
+      # until approved on the target. Control-plane calls only, so a GitHub-hosted runner can make them.
+      - name: check for shared private links to approve
+        id: spl
+        run: echo "pending=$(jq 'length > 0' "$RUNNER_TEMP/shared_private_links.json")" >> "$GITHUB_OUTPUT"
+      - if: steps.spl.outputs.pending == 'true'
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          allow-no-subscriptions: true
+      - if: steps.spl.outputs.pending == 'true'
+        name: approve AI Search shared private links
+        run: scripts/approve-shared-private-links.sh < "$RUNNER_TEMP/shared_private_links.json"

@@ -6,6 +6,9 @@ output "cell_registration" {
     app_identity_principal_id      = module.app_identity.principal_id
     gateway_identity_id            = module.gateway_identity.id
     gateway_identity_client_id     = module.gateway_identity.client_id
+    ingest_identity_id             = module.ingest_identity.id
+    ingest_identity_client_id      = module.ingest_identity.client_id
+    ingest_identity_principal_id   = module.ingest_identity.principal_id
     openai_endpoint                = module.ai.openai_endpoint
     key_vault_uri                  = module.key_vault.uri
     storage_blob_url               = module.storage.blob_endpoint
@@ -17,5 +20,6 @@ output "resource_group_id" { value = data.azurerm_resource_group.this.id }
 output "openai_id" { value = module.ai.openai_id }
 output "app_identity_roles" { value = module.app_identity.role_keys }
 output "gateway_identity_roles" { value = module.gateway_identity.role_keys }
+output "ingest_identity_roles" { value = module.ingest_identity.role_keys }
 output "openai_public_network_access_enabled" { value = module.ai.openai_public_network_access_enabled }
 output "openai_local_auth_enabled" { value = module.ai.openai_local_auth_enabled }

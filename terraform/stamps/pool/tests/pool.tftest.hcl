@@ -71,8 +71,18 @@ run "background_work_runs_as_a_per_tenant_identity" {
   command = plan
 
   assert {
-    condition     = length(azurerm_user_assigned_identity.ingest) == 3 && length(azurerm_container_app_job.ingest) == 3
+    condition     = length(azurerm_user_assigned_identity.ingest) == 3 && length(module.ingestion.job_names) == 3
     error_message = "One ingestion identity and one job per tenant."
+  }
+  assert {
+    condition = alltrue([for k, s in module.ingestion.settings :
+      s["AZURE_STORAGE_CONTAINER"] == k && s["AZURE_SEARCH_INDEX"] == k && s["MANAGE_INDEX"] == "false"
+    ])
+    error_message = "Each tenant's job works on its own container and index, and can't change index definitions."
+  }
+  assert {
+    condition     = azurerm_role_assignment.index_admin["search"].role_definition_name == "Search Service Contributor" && module.ingestion.index_admin_job_name == "job-index-admin"
+    error_message = "Index definitions on the shared Search service are managed by the pool's own index admin identity."
   }
 }
 

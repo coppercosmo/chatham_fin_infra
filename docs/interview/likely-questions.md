@@ -107,6 +107,10 @@ The Azure Policy add-on runs Gatekeeper, so P&T's Kubernetes policy initiatives 
 containers, allowed registries, required limits) are enforced in-cluster, and compliance shows up in
 the same Azure Policy view they already use.
 
+## The AI layer (RAG)
+
+Fifteen questions on the AI side (what happens when an analyst asks a question, RAG versus fine-tuning, hybrid search, PTU, evaluations, prompt injection through documents, push versus pull indexing, agents) are answered at the end of [the AI layer deep dive](deep-dives/ai-architecture.md#interview-questions-and-answers).
+
 ## AI gateway (ADR 0012)
 
 **"Where does an AI gateway fit, and doesn't the WAF already do this?"**

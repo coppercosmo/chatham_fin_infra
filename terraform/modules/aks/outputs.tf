@@ -7,3 +7,7 @@ output "private_cluster_enabled" { value = azurerm_kubernetes_cluster.this.priva
 output "local_account_disabled" { value = azurerm_kubernetes_cluster.this.local_account_disabled }
 output "network_policy" { value = azurerm_kubernetes_cluster.this.network_profile[0].network_policy }
 output "outbound_type" { value = azurerm_kubernetes_cluster.this.network_profile[0].outbound_type }
+output "workload_identity_subjects" {
+  description = "key => the one Kubernetes service account each managed identity trusts in this cluster."
+  value       = { for k, f in azurerm_federated_identity_credential.workload : k => f.subject }
+}

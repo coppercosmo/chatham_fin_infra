@@ -11,6 +11,8 @@ something real.
 2. [Isolation tiers](../architecture/isolation-tiers.md): the cost question everyone asks about
    subscription-per-client, and the two cheaper designs.
 3. Deep dives ([index](deep-dives/README.md)):
+   [the AI layer end to end (RAG)](deep-dives/ai-architecture.md), with a
+   [request-flow diagram](../architecture/diagram/ai-request-flow.svg),
    [data isolation for AI](deep-dives/data-isolation-for-ai.md),
    [observability per client](deep-dives/observability-per-client.md),
    [landing zones and policy](deep-dives/landing-zones-and-policy.md),

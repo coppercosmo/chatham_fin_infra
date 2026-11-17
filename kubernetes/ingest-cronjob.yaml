@@ -1,0 +1,79 @@
+# Document ingestion on AKS (ADR 0015): the same job, image and settings as the Container Apps job that
+# terraform/modules/ingestion-job creates for other clients, as a CronJob. Values in <angle brackets> come from
+# `terraform output ingestion` (settings) for this client.
+#
+# Workload identity: pods using this service account get Entra tokens as the client's INGESTION identity
+# (id-<client>-prd-<region>-ingest), not the app's. The federated credential in Terraform trusts exactly
+# system:serviceaccount:advisor:advisor-ingest on THIS cluster's OIDC issuer.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: advisor-ingest
+  namespace: advisor
+  annotations:
+    azure.workload.identity/client-id: "<ingestion.identity_client_id>"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: advisor-ingest
+  namespace: advisor
+data: # from `terraform output ingestion` (settings)
+  CLIENT_CODE: "<client>"
+  INGEST_MODE: "push"
+  MANAGE_INDEX: "true"
+  AZURE_STORAGE_BLOB_URL: "<storage_blob_url>"
+  AZURE_STORAGE_CONTAINER: "documents"
+  AZURE_SEARCH_ENDPOINT: "<search_endpoint>"
+  AZURE_SEARCH_INDEX: "<search_index>"
+  AZURE_OPENAI_ENDPOINT: "<openai_endpoint>" # the AI gateway, so embedding tokens are limited and metered
+  EMBEDDING_DEPLOYMENT: "embeddings"
+  CHUNK_TOKENS: "512"
+  CHUNK_OVERLAP_TOKENS: "128"
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: advisor-ingest
+  namespace: advisor
+spec:
+  schedule: "0 2 * * *" # off-peak, so embeddings don't compete with chat for tokens
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 3600
+      template:
+        metadata:
+          labels:
+            app: advisor-ingest
+            azure.workload.identity/use: "true" # injects AZURE_CLIENT_ID, AZURE_TENANT_ID, token file
+        spec:
+          serviceAccountName: advisor-ingest
+          automountServiceAccountToken: false
+          restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            runAsGroup: 10001
+            seccompProfile: { type: RuntimeDefault }
+          containers:
+            - name: ingest
+              image: "<acr_login_server>/advisor-ingest@sha256:<digest>" # promoted by ring with the app
+              imagePullPolicy: Always
+              envFrom:
+                - configMapRef: { name: advisor-ingest }
+              resources:
+                requests: { cpu: 250m, memory: 512Mi }
+                limits: { cpu: "1", memory: 1Gi }
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities: { drop: ["ALL"] }
+              volumeMounts:
+                - { name: scratch, mountPath: /tmp } # extracted text before chunking
+          volumes:
+            - name: scratch
+              emptyDir: { sizeLimit: 2Gi }

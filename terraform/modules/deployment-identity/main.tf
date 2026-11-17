@@ -34,7 +34,9 @@ locals {
     "ba92f5b4-2d11-453d-a403-e96b0029c9fe", # Storage Blob Data Contributor
     "1407120a-92aa-4202-b7e9-c0e197c71c8f", # Search Index Data Reader
     "3913510d-42f4-4e42-8a64-420c390055eb", # Monitoring Metrics Publisher
-    "2a2b9908-6ea1-4ae2-8e65-a410df84e7d1", # Storage Blob Data Reader (AI Search indexer)
+    "2a2b9908-6ea1-4ae2-8e65-a410df84e7d1", # Storage Blob Data Reader (ingestion job or AI Search indexer, ADR 0015)
+    "8ebe5a00-799e-43f5-93ac-243d3dce84a7", # Search Index Data Contributor (ingestion job, the client's own index)
+    "7ca78c08-252a-4471-8644-bb5ff32d4ba0", # Search Service Contributor (ingestion job: index definition on the client's own Search service)
     "acdd72a7-3d63-4fea-9abd-60d6d93d4a2a", # Reader (for P&T-owned reader group)
     # AKS option (ADR 0011): control-plane identity on its own subnet/route table/DNS zone, readers on the cluster.
     # Network Contributor is the broadest role in this list; the stamp only ever scopes it to one subnet or route table.

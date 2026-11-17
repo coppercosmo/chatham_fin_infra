@@ -1,6 +1,6 @@
 <!--
   Shared-cell AI gateway policy for client "${client}" (ADR 0014). Rendered by Terraform; do not edit in the portal.
-  The gateway is shared, but this API belongs to one client: it admits only that client's app identity and calls
+  The gateway is shared, but this API belongs to one client: it admits only that client's identities (its app and its ingestion job) and calls
   only that client's Azure OpenAI account, as that client's own gateway identity. Another client's model account
   trusts a different identity, so even a wrong backend here would get 401/403, not data.
 -->
@@ -9,13 +9,16 @@
     <base />
     <validate-azure-ad-token tenant-id="${tenant_id}" header-name="Authorization" failed-validation-httpcode="401" failed-validation-error-message="Unauthorized">
       <client-application-ids>
-        <application-id>${app_client_id}</application-id>
+%{ for id in caller_client_ids ~}
+        <application-id>${id}</application-id>
+%{ endfor ~}
       </client-application-ids>
       <audiences>
         <audience>https://cognitiveservices.azure.com</audience>
       </audiences>
     </validate-azure-ad-token>
     <set-variable name="callerAppId" value="@(context.Request.Headers.GetValueOrDefault(&quot;Authorization&quot;,&quot;&quot;).AsJwt()?.Claims.GetValueOrDefault(&quot;appid&quot;, &quot;unknown&quot;))" />
+    <!-- One limit per client: its app and its ingestion job share the client's budget on the shared gateway. -->
     <llm-token-limit counter-key="${client}" tokens-per-minute="${tpm}"%{ if quota > 0 } token-quota="${quota}" token-quota-period="Monthly"%{ endif } estimate-prompt-tokens="true" remaining-tokens-header-name="x-ratelimit-remaining-tokens" tokens-consumed-header-name="x-tokens-consumed" />
     <llm-emit-token-metric namespace="ai-gateway">
       <dimension name="Client" value="${client}" />

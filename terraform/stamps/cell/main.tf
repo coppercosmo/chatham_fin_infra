@@ -45,6 +45,7 @@ locals {
   client_assignable_roles = [
     "Key Vault Secrets User",
     "Storage Blob Data Contributor",
+    "Storage Blob Data Reader", # the client's ingestion identity on its own documents (ADR 0015)
     "Monitoring Metrics Publisher",
     "Cognitive Services OpenAI User",
     "Managed Identity Operator",
@@ -325,12 +326,81 @@ module "private_endpoint" {
   tags                 = local.tags
 }
 
+# A client with an ingestion identity has its own job load the index, so its app only reads it. A client without
+# one keeps the app as the writer.
 resource "azurerm_role_assignment" "index" {
   for_each             = var.clients
   scope                = "${azurerm_search_service.shared.id}/indexes/${each.key}"
-  role_definition_name = "Search Index Data Contributor"
+  role_definition_name = contains(keys(local.ingesting), each.key) ? "Search Index Data Reader" : "Search Index Data Contributor"
   principal_id         = each.value.app_identity_principal_id
   principal_type       = "ServicePrincipal"
+}
+
+# ------------------------------------------------------------------ document ingestion (ADR 0015)
+locals {
+  ingesting = { for k, c in var.clients : k => c if var.ingest_image != null && c.ingest_identity_id != null }
+}
+
+resource "azurerm_role_assignment" "ingest_index" {
+  for_each             = local.ingesting
+  scope                = "${azurerm_search_service.shared.id}/indexes/${each.key}"
+  role_definition_name = "Search Index Data Contributor"
+  principal_id         = each.value.ingest_identity_principal_id
+  principal_type       = "ServicePrincipal"
+}
+
+# Index definitions on the shared service belong to the platform. Search Service Contributor manages definitions
+# (fields, vector profile, semantic configuration) but can't read or load documents. It is service-wide, which is
+# why no client identity ever gets it here.
+resource "azurerm_user_assigned_identity" "index_admin" {
+  count               = var.ingest_image == null ? 0 : 1
+  name                = "id-${module.naming.base}-index-admin"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.shared.name
+  tags                = local.tags
+}
+
+resource "azurerm_role_assignment" "index_admin" {
+  for_each = var.ingest_image == null ? {} : merge(
+    { search = { scope = azurerm_search_service.shared.id, role = "Search Service Contributor" } },
+    var.acr == null ? {} : { acr = { scope = var.acr.id, role = "AcrPull" } },
+  )
+  scope                = each.value.scope
+  role_definition_name = each.value.role
+  principal_id         = azurerm_user_assigned_identity.index_admin[0].principal_id
+  principal_type       = "ServicePrincipal"
+}
+
+module "ingestion" {
+  source                       = "../../modules/ingestion-job"
+  count                        = var.ingest_image == null ? 0 : 1
+  resource_group_name          = azurerm_resource_group.shared.name
+  location                     = var.location
+  tags                         = local.tags
+  container_app_environment_id = azurerm_container_app_environment.shared.id
+  image                        = var.ingest_image
+  registry_server              = var.acr == null ? null : var.acr.login_server
+
+  jobs = {
+    for k, c in local.ingesting : k => {
+      identity_id        = c.ingest_identity_id
+      identity_client_id = c.ingest_identity_client_id
+      storage_blob_url   = c.storage_blob_url
+      search_endpoint    = "https://${azurerm_search_service.shared.name}.search.windows.net"
+      search_index       = k
+      openai_endpoint    = "${azurerm_api_management.shared.gateway_url}/${k}" # the client's own API on the shared gateway
+      schedule           = c.ingest_schedule
+    }
+  }
+
+  index_admin = {
+    identity_id        = azurerm_user_assigned_identity.index_admin[0].id
+    identity_client_id = azurerm_user_assigned_identity.index_admin[0].client_id
+    search_endpoint    = "https://${azurerm_search_service.shared.name}.search.windows.net"
+    indexes            = keys(var.clients)
+  }
+
+  depends_on = [azurerm_role_assignment.ingest_index, azurerm_role_assignment.index_admin]
 }
 
 # ------------------------------------------------------------------ shared Container Apps environment, one app per client
@@ -606,7 +676,7 @@ locals {
     for k, c in var.clients : k => templatefile("${path.module}/gateway-policy.xml.tftpl", {
       client            = k
       tenant_id         = data.azurerm_client_config.current.tenant_id
-      app_client_id     = c.app_identity_client_id
+      caller_client_ids = compact([c.app_identity_client_id, contains(keys(local.ingesting), k) ? c.ingest_identity_client_id : null])
       gateway_client_id = c.gateway_identity_client_id
       tpm               = c.tokens_per_minute
       quota             = c.monthly_token_quota

@@ -17,6 +17,10 @@ hub = {
 ai_gateway_sku      = "Premium_1"
 enable_private_link = true # tailspin connects from its own Azure subscription
 
+# Document ingestion (ADR 0015): runs each client's ingestion job (for clients that registered an ingestion
+# identity) and the cell's index admin job, which owns the index definitions on the shared Search service.
+ingest_image = "craiadvx7k2.azurecr.io/advisor-ingest@sha256:0000000000000000000000000000000000000000000000000000000000000000"
+
 acr = {
   id           = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-aiadv-platform/providers/Microsoft.ContainerRegistry/registries/craiadvx7k2"
   login_server = "craiadvx7k2.azurecr.io"
@@ -66,6 +70,9 @@ clients = {
     key_vault_uri                  = "https://kv-northwind-prd-eus2-1a2b.vault.azure.net/"
     storage_blob_url               = "https://stnorthwindprdeus21a2b.blob.core.windows.net/"
     app_insights_connection_string = "InstrumentationKey=a1000000-0000-0000-0000-000000000000"
+    ingest_identity_id             = "/subscriptions/55555555-5555-5555-5555-555555555555/resourceGroups/rg-northwind-prd-eus2/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-northwind-prd-eus2-ingest"
+    ingest_identity_client_id      = "a1000000-0000-0000-0000-00000000000c"
+    ingest_identity_principal_id   = "a1000000-0000-0000-0000-0000000000cc"
   }
   tailspin = {
     host_name             = "tailspin.ai.chatham.example.com"
@@ -83,6 +90,9 @@ clients = {
     key_vault_uri                  = "https://kv-tailspin-prd-eus2-3c4d.vault.azure.net/"
     storage_blob_url               = "https://sttailspinprdeus23c4d.blob.core.windows.net/"
     app_insights_connection_string = "InstrumentationKey=b1000000-0000-0000-0000-000000000000"
+    ingest_identity_id             = "/subscriptions/55555555-5555-5555-5555-555555555555/resourceGroups/rg-tailspin-prd-eus2/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-tailspin-prd-eus2-ingest"
+    ingest_identity_client_id      = "b1000000-0000-0000-0000-00000000000c"
+    ingest_identity_principal_id   = "b1000000-0000-0000-0000-0000000000cc"
   }
   litware = {
     host_name             = "litware.ai.chatham.example.com"

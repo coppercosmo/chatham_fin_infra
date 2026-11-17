@@ -62,8 +62,12 @@ run "app_identity_reaches_only_this_clients_data_and_no_model" {
     error_message = "The gateway identity can call this client's model account and nothing else."
   }
   assert {
-    condition     = length(azurerm_role_assignment.cell_attaches_identity) == 2 && alltrue([for r in azurerm_role_assignment.cell_attaches_identity : r.role_definition_name == "Managed Identity Operator"])
-    error_message = "The cell pipeline may attach the identities, nothing more."
+    condition     = toset(output.ingest_identity_roles) == toset(["documents"])
+    error_message = "The ingestion identity reads this client's documents; the cell adds write on this client's index only (ADR 0015)."
+  }
+  assert {
+    condition     = length(azurerm_role_assignment.cell_attaches_identity) == 3 && alltrue([for r in azurerm_role_assignment.cell_attaches_identity : r.role_definition_name == "Managed Identity Operator"])
+    error_message = "The cell pipeline may attach the identities (app, gateway, ingestion), nothing more."
   }
 }
 

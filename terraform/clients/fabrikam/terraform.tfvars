@@ -40,6 +40,14 @@ model_deployments = {
   embeddings = { model_name = "text-embedding-3-large", model_version = "1", sku = "DataZoneStandard", capacity = 20 }
 }
 
+# Document ingestion (ADR 0015), pull mode: AI Search's own indexer reads fabrikam's storage and calls the
+# embedding model through two shared private links, approved on each target by the apply workflow
+# (scripts/approve-shared-private-links.sh). The job only applies the indexer definitions and starts runs.
+ingestion = {
+  image = "craiadvx7k2.azurecr.io/advisor-ingest@sha256:0000000000000000000000000000000000000000000000000000000000000000"
+  mode  = "pull"
+}
+
 acr = {
   id           = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-aiadv-platform/providers/Microsoft.ContainerRegistry/registries/craiadvx7k2"
   login_server = "craiadvx7k2.azurecr.io"

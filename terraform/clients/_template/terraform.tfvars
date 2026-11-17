@@ -24,6 +24,12 @@ reader_group_object_id = "CHANGEME" # sg-aiadv-<code>-readers (P&T)
 
 compute_platform = "container_apps" # or "aks" (ADR 0011); see clients/meridian for an AKS example
 
+# Document ingestion (ADR 0015). push (default): a scheduled job embeds through the AI gateway and writes the
+# client's index. pull: AI Search's indexer, through shared private links (see clients/fabrikam).
+ingestion = {
+  image = "<acr>.azurecr.io/advisor-ingest@sha256:<digest>"
+}
+
 ingress = { # ADR 0010; null = no ingress
   host_name             = "CHANGEME.ai.chatham.example.com"
   certificate_secret_id = "https://<client-kv>.vault.azure.net/secrets/<cert-name>" # versionless

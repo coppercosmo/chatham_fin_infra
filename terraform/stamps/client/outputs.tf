@@ -67,3 +67,25 @@ output "ingress_allowed_sources" {
   description = "Sources admitted on 443 by the App Gateway subnet NSG."
   value       = module.network.agw_allowed_source_prefixes
 }
+
+# Document ingestion (ADR 0015)
+output "search_index" { value = var.enable_search ? local.search_index : null }
+output "ingestion" {
+  description = "How the index is filled, and what runs it. On AKS, settings fill kubernetes/ingest-cronjob.yaml."
+  value = local.ingest ? {
+    mode               = var.ingestion.mode
+    identity_client_id = module.ingest_identity[0].client_id
+    job_name           = try(module.ingestion[0].job_names[var.client], null)
+    settings           = { for k, v in local.ingestion_settings : k => tostring(v) if !contains(["identity_id", "schedule"], k) }
+  } : null
+}
+output "shared_private_links" {
+  description = "Pull mode: links that must be approved on their targets (scripts/approve-shared-private-links.sh)."
+  value = {
+    for k, l in azurerm_search_shared_private_link_service.this : k => {
+      target_resource_id = l.target_resource_id
+      request_message    = l.request_message
+      search_service     = local.n.search
+    }
+  }
+}

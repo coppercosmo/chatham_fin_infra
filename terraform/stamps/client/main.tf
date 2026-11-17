@@ -44,6 +44,13 @@ locals {
   use_ai_gateway = var.ai_gateway != null
   content_safety = try(var.ai_gateway.enable_content_safety, false)
 
+  # ---- Document ingestion (ADR 0015)
+  search_index     = var.client # one index, named after the client, in the client's own Search service
+  ingest           = var.ingestion != null && var.enable_search
+  ingest_pull      = local.ingest && try(var.ingestion.mode, "push") == "pull"
+  ingest_push      = local.ingest && !local.ingest_pull
+  ingest_container = try(var.ingestion.storage_container, "documents")
+
   # ---- Client network connectivity (ADR 0013)
   cc                  = var.client_connectivity
   client_routed       = contains(["vpn", "expressroute"], local.cc.type) # through P&T's shared hub
@@ -108,6 +115,21 @@ check "gateway_transit_for_routed_clients" {
   assert {
     condition     = !(local.client_routed && local.landing_zone) || try(var.hub.gateway_transit, false)
     error_message = "client_connectivity is ${local.cc.type} but hub.gateway_transit is false: hand output.hub_connectivity_request to P&T, then set gateway_transit = true once their side is applied."
+  }
+}
+
+resource "terraform_data" "ingestion_contract" {
+  input = local.ingest ? var.ingestion.mode : "none"
+
+  lifecycle {
+    precondition {
+      condition     = var.ingestion == null || var.enable_search
+      error_message = "ingestion needs enable_search = true: there is no index to fill."
+    }
+    precondition {
+      condition     = !local.ingest_push || contains(keys(var.model_deployments), try(var.ingestion.embedding_deployment, "embeddings"))
+      error_message = "ingestion.embedding_deployment must be one of model_deployments."
+    }
   }
 }
 
@@ -186,6 +208,7 @@ module "ai" {
   resource_group_name  = azurerm_resource_group.this.name
   location             = var.location
   model_deployments    = var.model_deployments
+  content_filter       = var.content_filter
   enable_search        = var.enable_search
   search_replica_count = var.search_replica_count
   allowed_outbound_fqdns = [
@@ -269,9 +292,78 @@ module "app_identity" {
   )
 }
 
-# AI Search reads documents from blob storage and calls AOAI for vectorization with its own identity.
+# ------------------------------------------------------------------ document ingestion (ADR 0015)
+# Push (default): the job's own identity reads documents, writes this client's index and, because this Search
+# service belongs to this client alone, may create the index definition. Embeddings go through the AI gateway.
+# Pull: the job only manages the indexer definitions; Search's own identity reads storage and calls the model.
+module "ingest_identity" {
+  source              = "../../modules/workload-identity"
+  count               = local.ingest ? 1 : 0
+  name                = "id-${module.naming.base}-ingest"
+  resource_group_name = azurerm_resource_group.this.name
+  location            = var.location
+  tags                = local.tags
+
+  role_assignments = merge(
+    { index_admin = { scope = module.ai.search_id, role = "Search Service Contributor" } },
+    local.ingest_push ? {
+      documents = { scope = "${module.storage.id}/blobServices/default/containers/${local.ingest_container}", role = "Storage Blob Data Reader" }
+      index     = { scope = "${module.ai.search_id}/indexes/${local.search_index}", role = "Search Index Data Contributor" }
+    } : {},
+    local.ingest_push && !local.use_ai_gateway ? {
+      openai = { scope = module.ai.openai_id, role = "Cognitive Services OpenAI User" }
+    } : {},
+    var.acr != null ? { acr = { scope = var.acr.id, role = "AcrPull" } } : {},
+  )
+}
+
+locals {
+  ingestion_settings = local.ingest ? {
+    identity_id          = module.ingest_identity[0].id
+    identity_client_id   = module.ingest_identity[0].client_id
+    storage_blob_url     = module.storage.blob_endpoint
+    storage_container    = local.ingest_container
+    search_endpoint      = module.ai.search_endpoint
+    search_index         = local.search_index
+    openai_endpoint      = local.use_ai_gateway ? module.ai_gateway[0].gateway_url : module.ai.openai_endpoint
+    embedding_deployment = var.ingestion.embedding_deployment
+    schedule             = var.ingestion.schedule
+    mode                 = var.ingestion.mode
+    manage_index         = true # this client's own Search service, so its own identity may own the schema
+  } : null
+}
+
+module "ingestion" {
+  source                       = "../../modules/ingestion-job"
+  count                        = local.ingest && local.use_aca ? 1 : 0
+  resource_group_name          = azurerm_resource_group.this.name
+  location                     = var.location
+  tags                         = local.tags
+  container_app_environment_id = module.apps[0].environment_id
+  image                        = var.ingestion.image
+  registry_server              = var.acr == null ? null : var.acr.login_server
+  jobs                         = { (var.client) = local.ingestion_settings }
+
+  depends_on = [module.ingest_identity, module.private_endpoint]
+}
+
+# Pull mode only: Search reaches storage and the model account, both private, through shared private links
+# (private endpoints in Search's managed network). They stay Pending until approved on the target.
+resource "azurerm_search_shared_private_link_service" "this" {
+  for_each = local.ingest_pull ? {
+    blob   = { target = module.storage.id, subresource = "blob" }
+    openai = { target = module.ai.openai_id, subresource = "openai_account" }
+  } : {}
+  name               = "spl-${each.key}"
+  search_service_id  = module.ai.search_id
+  subresource_name   = each.value.subresource
+  target_resource_id = each.value.target
+  request_message    = "AI Search indexer for ${var.client} (ADR 0015)"
+}
+
+# Pull mode only: AI Search reads documents and calls the embedding model with its own identity.
 resource "azurerm_role_assignment" "search_to_blob" {
-  count                = var.enable_search ? 1 : 0
+  count                = local.ingest_pull ? 1 : 0
   scope                = module.storage.id
   role_definition_name = "Storage Blob Data Reader"
   principal_id         = module.ai.search_principal_id
@@ -279,7 +371,7 @@ resource "azurerm_role_assignment" "search_to_blob" {
 }
 
 resource "azurerm_role_assignment" "search_to_openai" {
-  count                = var.enable_search ? 1 : 0
+  count                = local.ingest_pull ? 1 : 0
   scope                = module.ai.openai_id
   role_definition_name = "Cognitive Services OpenAI User"
   principal_id         = module.ai.search_principal_id
@@ -307,7 +399,10 @@ locals {
       AZURE_KEY_VAULT_URI    = module.key_vault.uri
       AZURE_STORAGE_BLOB_URL = module.storage.blob_endpoint
     },
-    var.enable_search ? { AZURE_SEARCH_ENDPOINT = module.ai.search_endpoint } : {}
+    var.enable_search ? {
+      AZURE_SEARCH_ENDPOINT = module.ai.search_endpoint
+      AZURE_SEARCH_INDEX    = local.search_index
+    } : {}
   )
 
   # Static IP for the AKS internal NGINX load balancer (app routing add-on), set in
@@ -365,13 +460,23 @@ module "aks" {
 
   # The same managed identity the app would use on Container Apps, now trusted for one
   # Kubernetes service account in this client's cluster only.
-  workload_identities = {
-    api = {
-      identity_id     = module.app_identity.id
-      namespace       = var.aks.app_namespace
-      service_account = var.aks.app_service_account
-    }
-  }
+  workload_identities = merge(
+    {
+      api = {
+        identity_id     = module.app_identity.id
+        namespace       = var.aks.app_namespace
+        service_account = var.aks.app_service_account
+      }
+    },
+    # The ingestion CronJob (kubernetes/ingest-cronjob.yaml) runs as its own identity, as on Container Apps.
+    local.ingest ? {
+      ingest = {
+        identity_id     = module.ingest_identity[0].id
+        namespace       = var.aks.app_namespace
+        service_account = "advisor-ingest"
+      }
+    } : {},
+  )
 
   depends_on = [module.private_endpoint]
 }
@@ -398,7 +503,8 @@ module "ai_gateway" {
     [{ name = "aoai-primary", url = module.ai.openai_endpoint, resource_id = module.ai.openai_id }],
     var.ai_gateway.additional_backends,
   )
-  allowed_caller_client_ids = [module.app_identity.client_id]
+  # The ingestion job is a separate caller, so it gets its own token-limit counter and shows separately in showback.
+  allowed_caller_client_ids = concat([module.app_identity.client_id], local.ingest_push ? [module.ingest_identity[0].client_id] : [])
   tokens_per_minute         = var.ai_gateway.tokens_per_minute
   monthly_token_quota       = var.ai_gateway.monthly_token_quota
   log_request_bodies_bytes  = var.ai_gateway.log_request_bodies_bytes

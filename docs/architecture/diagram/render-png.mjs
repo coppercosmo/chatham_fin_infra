@@ -1,6 +1,7 @@
 // Render diagram SVGs to 2x PNGs with Playwright + Chromium.
 //   NODE_PATH=$(npm root -g) node docs/architecture/diagram/render-png.mjs                       # solution-architecture
 //   NODE_PATH=$(npm root -g) node docs/architecture/diagram/render-png.mjs tier2-shared-cell tier3-pooled
+//   NODE_PATH=$(npm root -g) node docs/architecture/diagram/render-png.mjs ai-request-flow
 import { createRequire } from "node:module";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";

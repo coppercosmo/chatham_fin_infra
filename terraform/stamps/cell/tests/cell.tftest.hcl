@@ -63,6 +63,9 @@ variables {
       key_vault_uri                  = "https://kv-northwind-prd-eus2-1a2b.vault.azure.net/"
       storage_blob_url               = "https://stnorthwindprdeus21a2b.blob.core.windows.net/"
       app_insights_connection_string = "InstrumentationKey=a0000000-0000-0000-0000-000000000000"
+      ingest_identity_id             = "/subscriptions/11111111-1111-1111-1111-111111111111/resourceGroups/rg-northwind-prd-eus2/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-northwind-prd-eus2-ingest"
+      ingest_identity_client_id      = "a0000000-0000-0000-0000-00000000000c"
+      ingest_identity_principal_id   = "a0000000-0000-0000-0000-0000000000cc"
     }
     tailspin = {
       host_name                      = "tailspin.ai.chatham.example.com"
@@ -79,6 +82,9 @@ variables {
       key_vault_uri                  = "https://kv-tailspin-prd-eus2-3c4d.vault.azure.net/"
       storage_blob_url               = "https://sttailspinprdeus23c4d.blob.core.windows.net/"
       app_insights_connection_string = "InstrumentationKey=b0000000-0000-0000-0000-000000000000"
+      ingest_identity_id             = "/subscriptions/11111111-1111-1111-1111-111111111111/resourceGroups/rg-tailspin-prd-eus2/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-tailspin-prd-eus2-ingest"
+      ingest_identity_client_id      = "b0000000-0000-0000-0000-00000000000c"
+      ingest_identity_principal_id   = "b0000000-0000-0000-0000-0000000000cc"
     }
     litware = {
       host_name                      = "litware.ai.chatham.example.com"
@@ -282,4 +288,53 @@ run "client_without_a_slot_is_refused" {
   }
 
   expect_failures = [terraform_data.cell_contract]
+}
+
+# ---------------------------------------------------------------- document ingestion (ADR 0015)
+
+run "ingestion_jobs_run_as_each_clients_own_identity" {
+  command = plan
+
+  variables {
+    ingest_image = "craiadv.azurecr.io/advisor-ingest@sha256:2222222222222222222222222222222222222222222222222222222222222222"
+  }
+
+  assert {
+    condition     = toset(keys(module.ingestion[0].job_names)) == toset(["northwind", "tailspin"])
+    error_message = "Clients that registered an ingestion identity get a job; litware (none) keeps loading its index from its app."
+  }
+  assert {
+    condition = alltrue([for k, s in module.ingestion[0].settings :
+      s["AZURE_CLIENT_ID"] == var.clients[k].ingest_identity_client_id && s["AZURE_SEARCH_INDEX"] == k &&
+      s["AZURE_STORAGE_BLOB_URL"] == var.clients[k].storage_blob_url && s["MANAGE_INDEX"] == "false"
+    ])
+    error_message = "Each job runs as its own client's ingestion identity, on that client's storage and index, and can't change index definitions."
+  }
+  assert {
+    condition     = alltrue([for k, r in azurerm_role_assignment.ingest_index : r.principal_id == var.clients[k].ingest_identity_principal_id && r.role_definition_name == "Search Index Data Contributor"])
+    error_message = "Each ingestion identity writes its own client's index only (scope: <search>/indexes/<client>)."
+  }
+  assert {
+    condition = (
+      azurerm_role_assignment.index["northwind"].role_definition_name == "Search Index Data Reader" &&
+      azurerm_role_assignment.index["tailspin"].role_definition_name == "Search Index Data Reader" &&
+      azurerm_role_assignment.index["litware"].role_definition_name == "Search Index Data Contributor"
+    )
+    error_message = "Once a job loads the index, the client's app only reads it."
+  }
+  assert {
+    condition = alltrue(flatten([for k, c in var.clients : [
+      [for x in [c.ingest_identity_client_id] : strcontains(output.gateway_policies[k], "<application-id>${x}</application-id>") if x != null],
+      [for o, oc in var.clients : !strcontains(output.gateway_policies[k], oc.ingest_identity_client_id) if o != k && oc.ingest_identity_client_id != null],
+    ]]))
+    error_message = "A client's gateway API admits its own ingestion job, and never another client's."
+  }
+  assert {
+    condition     = azurerm_role_assignment.index_admin["search"].role_definition_name == "Search Service Contributor" && module.ingestion[0].index_admin_job_name == "job-index-admin"
+    error_message = "Index definitions on the shared service are managed by the platform's index admin job."
+  }
+  assert {
+    condition     = azurerm_user_assigned_identity.index_admin[0].resource_group_name == azurerm_resource_group.shared.name && length(azurerm_role_assignment.index_admin) == 1
+    error_message = "Search Service Contributor goes to the cell's own index admin identity only, never to a client identity."
+  }
 }
