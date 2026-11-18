@@ -274,7 +274,7 @@ one paid plan, the dashboard shows only MCSB.
 2. Apply the module to a sandbox MG, read the dashboard, then the AI Advisory MG.
 3. Read the failing controls. Fix them, or exempt them with an expiry date and an ADR (the known CMK gap first).
 4. Add a client's extra standards in the same pull request that onboards the client
-   ([onboarding runbook](../runbooks/onboard-a-client.md), step 1g).
+   ([onboarding runbook](../runbooks/onboard-a-client.md): step 1g for Tier 1, step 2 of Tier 2).
 5. Before quoting a standard to a client, check its current name and version in the Defender portal:
    built-in versions change without notice; the GUIDs don't.
 
